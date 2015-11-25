@@ -1,0 +1,38 @@
+
+
+{% block body %}
+
+    <div class="container">        
+        <div class="row">
+            <div class="box">
+
+                <div class="col-lg-12">
+                    <hr>
+                    <h1 class="page-header text-center">
+                        <strong>Ingredient List</strong>
+                    </h1>
+                </div>
+
+                <div>
+                    {% for ingred in ingreds %}
+                        Ingredient: 
+                        <a href="/ingred_ndb_detail/{{ ingred.pk }}">
+                            {{ ingred.ndb_description }}
+                        </a>
+                        <br>
+                    {% endfor %}
+                    <hr>
+                </div>
+
+                <div>
+                    <a href="/ingred_add/">
+                        Add an Ingredient to the Database
+                    </a>
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

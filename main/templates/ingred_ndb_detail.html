@@ -1,0 +1,87 @@
+
+{% block body %}
+
+    <div class="container">        
+        <div class="row">
+            <div class="box">
+
+                <div class="col-lg-12">
+                    <hr>
+                    <h1 class="page-header text-center">
+                        <strong>{{ ingred_v.ndb_description }}</strong>
+                    </h1>
+                </div>
+
+                <div>
+                    Ingredient Name: {{ ingred_v.name }}<br>
+                    NDB Description: {{ ingred_v.ndb_description }}<br>
+                    NDB#: {{ ingred_v.ndb_no }}<br>
+                    recipes: {{ ingred_v.recipe }}<br>
+                    image: {{ ingred_v.image }}<br>
+                    wiki_link: {{ ingred_v.wiki_link }}<br>
+                    <hr>
+                </div>
+
+                <div>
+                    <h2>Forms and/or Units</h2>
+                    {% for mea in measures %}
+                        <ul>
+                            <li>{{ mea.1 }} {{ mea.2 }} ({{ mea.0 }} g)</li>
+                        </ul>
+                    {% endfor %}
+                    <hr>
+                </div>
+
+                <div id="nutrition_table_header" style="max-width:600px;">
+                    <strong>Detailed Nutritional Information</strong><br><br>
+
+                    <table id="nutrition_table_table" style="width:80%">
+                        <tr>
+                            <td align="right"><strong>Substance - </strong></td>
+                            <td><strong> - Amount per 100 g of Ingredient</strong></td>
+                        </tr>
+
+                    {% for nutr in nutr_list %}
+                        <tr>
+                            <td align="right">{{ nutr.0 }} - </td>
+                            <td> - {{ nutr.1 }} {{ nutr.2 }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </table>
+                    <hr>
+                </div>
+
+                <div>
+                    <a href="/ingred_del_page/{{ ingred.pk }}">
+                        Delete Ingredient from Database
+                    </a>
+                     --- 
+                    <a href="/ingred_add/">
+                        Add Another Ingredient to Database
+                    </a>
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.js">
+        </script>
+
+        <script type="text/javascript">
+
+            $('#nutrition_table_table').hide();
+
+            $('#nutrition_table_header').on('mouseenter', function(e){
+                $('#nutrition_table_table').fadeIn();
+            });
+
+            $('#nutrition_table_header').on('mouseleave', function(e){
+                $('#nutrition_table_table').fadeOut();
+            });
+
+        </script>
+
+{% endblock body %}

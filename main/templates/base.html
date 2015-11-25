@@ -1,0 +1,121 @@
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Recipe Organizer</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS added by E Jeter -->
+    <link href="{% static 'css/recipes_style.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/home/">Recipe Organizer</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="/about/">About</a>
+                    </li>
+                    <li>
+                        <a href="/recipe_list/">Recipes</a>
+                    </li>
+                    <li>
+                        <a href="/ingred_list/">Ingredients</a>
+                    </li>
+                    <li>
+                        <a href="/category_list/">Categories</a>
+                    </li>
+                    <li>
+                        {% if user.is_anonymous %}
+                            <a href="{% url 'sign_in_v' %}">Login</a>
+                        {% else %}
+                            <a href="{% url 'sign_out_v' %}?next=/">Logout: {{ user }}</a>
+                        {% endif %}
+                    </li>
+                    {% comment %}<!-- <li>
+                        <div id="search_form">
+                            {% crispy search_form %}
+                        </div>
+                    </li> --> {% endcomment %}
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    {% block body %}
+
+    {% endblock body %}
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="text-center
+                            col-lg-6 col-lg-offset-0
+                            col-md-6 col-md-offset-0
+                            col-sm-6 col-sm-offset-0
+                            col-xs-6 col-xs-offset-0
+                            "
+                >
+                    <p>Copyright &copy; Edje Jeter 2015: for training.</p>
+                </div>
+                <div class="col-lg-6 col-lg-offset-0
+                            col-md-6 col-md-offset-0
+                            col-sm-6 col-sm-offset-0
+                            col-xs-6 col-xs-offset-0
+                            "
+                     style="text-align: center"
+                    >
+                    <a href="/recipe_list/">Go to Recipe List</a> --- 
+
+                    <a href="/ingred_list/">Go to Ingredient List</a>
+
+                    <!-- {% comment %}<a class="btn btn-success text-center" 
+                       href="/contact_view/"
+                       role="button">
+                            Contact
+                    </a> {% endcomment %} -->
+                </div>
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+
+</html>
