@@ -1,0 +1,30 @@
+/*!
+ * Modifications to startbootstrap.com template "Thumbnail Gallery"
+ * Start Bootstrap - Thumbnail Gallery HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+ /*! Change .thumb from thumbnail-gallery.css: margin-bottom was 30px */
+.thumb {
+    margin-bottom: 40px;
+}
+
+/*! Change .img-responsive from bootstrap.css: add max-height; */
+.img-responsive,
+.thumbnail > img,
+.thumbnail a > img,
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+  max-height: 250px;
+}
+
+/*! Change p from bootstrap.css: add white-space; 
+p {
+    white-space: nowrap;
+}*/
+
+#search_form {
+    margin: 12px;
+
+}

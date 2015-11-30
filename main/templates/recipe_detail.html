@@ -1,0 +1,94 @@
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+    <div class="container">        
+        <div class="row">
+            <div class="box">
+
+                <div class="col-lg-12">
+                    <h1 class="page-header text-center">
+                        <strong>{{ artists.artist_name }}</strong>
+                    </h1>
+                </div>
+                print {{ recipe_v }}
+                <div>
+                    Recipe name: {{ recipe_v.name }}<br>
+                    description: {{ recipe_v.description }}<br>
+                    category: {{ recipe_v.category }}<br>
+                    tags: {{ recipe_v.tags }}<br>
+                    time_prep: {{ recipe_v.time_prep }}<br>
+                    time_cook: {{ recipe_v.time_cook }}<br>
+                    time_tot: {{ recipe_v.time_tot }}<br>
+                    directions: {{ recipe_v.directions }}<br>
+                    author: {{ recipe_v.author }}<br>
+                    owner: {{ recipe_v.owner }}<br>
+                    image: {{ recipe_v.image }}<br>
+                    <hr>
+                </div>
+
+                <div>
+                    <a href="/recipe_edit/{{ recipe_v.pk }}">
+                        Edit this Recipe
+                    </a>
+                     --- 
+                    <a href="/recipe_del_page/{{ recipe_v.pk }}">
+                        Delete Recipe from Database
+                    </a>
+                     --- 
+                    <a href="/recipe_add/">
+                        Add Another Recipe to Database
+                    </a>
+                </div>
+
+                <div>
+                    {% if active %}
+                        vote state = {{ vote_v.state }}
+                        <br>
+                        <a href="/vote_up_func/{{ recipe_v.pk }}">
+                            Vote Up
+                        </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
+                        
+                        <a href="/vote_dn_func/{{ recipe_v.pk }}">
+                            Vote Down
+                        </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
+
+                    {% else %}
+                        You must be signed-in to vote <br>
+                        ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
+                        ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
+
+                    {% endif %}
+
+                </div>
+
+                <div>
+                    <hr>
+                    {% for comment in old_comments_v %}
+                        {{ comment.number }}. <br>
+                        {{ comment.text }}<br>
+                        Comment by 
+                        {{ comment.user_name }} --- 
+                        {{ comment.time_stamp }}<hr>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {% if active %}
+                        {% crispy comments_v %}
+                    {% else %}
+                        You must be signed-in to comment. Please 
+                        <a href="/sign_in/">sign in</a> 
+                        or 
+                        <a href="/sign_in/">create an account</a> 
+                        and sign in.
+                    {% endif %}
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

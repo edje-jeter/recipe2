@@ -6,8 +6,31 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^temp/$', 'main.views.Temp', name='temp'),
+    url(r'^json_response/$', 'main.views.json_response', name='json_response'),
+    url(r'^json_measures/$', 'main.views.json_measures', name='json_measures'),
+
     url(r'^ingred_ndb_list/$', 'main.views.IngredNDBListView', name='ingred_ndb_list'),
     url(r'^ingred_ndb_detail/(?P<pk>\d+)/$', 'main.views.IngredNDBDetailView', name='ingred_ndb_detail'),
+    url(r'^ingred_add/$', 'main.views.ingred_add', name='ingred_add'),
+    url(r'^ingred_del_func/(?P<pk>\d+)/$', 'main.views.ingred_del_func', name='ingred_del_func'),
+    url(r'^ingred_del_page/(?P<pk>\d+)/$', 'main.views.ingred_del_page', name='ingred_del_page'),
+
+    url(r'^recipe_list/$', 'main.views.RecipeListView', name='recipe_list'),
+    url(r'^recipe_detail/(?P<pk>\d+)/$', 'main.views.RecipeDetailView', name='recipe_detail'),
+    url(r'^recipe_add/$', 'main.views.recipe_add', name='recipe_add'),
+    url(r'^recipe_edit/(?P<pk>\d+)/$', 'main.views.recipe_edit', name='recipe_edit'),
+    url(r'^recipe_del_func/(?P<pk>\d+)/$', 'main.views.recipe_del_func', name='recipe_del_func'),
+    url(r'^recipe_del_page/(?P<pk>\d+)/$', 'main.views.recipe_del_page', name='recipe_del_page'),
+
+    url(r'^sign_up/$', 'main.views.sign_up', name='sign_up'),
+    url(r'^sign_in/$', 'main.views.sign_in', name='sign_in_v'),
+    url(r'^sign_out/$', 'main.views.sign_out', name='sign_out_v'),
+    url(r'^user_del_page/$', 'main.views.user_del_page', name='user_del_page'),
+
+    url(r'^vote_up_func/(?P<pk>\d+)/$', 'main.views.vote_up_func', name='vote_up_func'),
+    url(r'^vote_dn_func/(?P<pk>\d+)/$', 'main.views.vote_dn_func', name='vote_dn_func'),
+    url(r'^vote_stats_func/(?P<pk>\d+)/$', 'main.views.vote_stats_func', name='vote_stats_func'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
