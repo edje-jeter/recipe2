@@ -41,7 +41,6 @@ class IngredNutr(models.Model):
     energy_tot = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
     energy_ptn = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
     energy_fat = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
-    energy_cho = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
 
     def __unicode__(self):
         return self.handle
@@ -51,18 +50,18 @@ class IngredNutr(models.Model):
 class Recipe(models.Model):
     ingred = models.ManyToManyField(IngredNutr, through='main.Quantity')
 
-    name = models.CharField(max_length=255, null=False, blank=False)
-    description = models.TextField(null=False, blank=False)
+    name = models.CharField(max_length=255, null=False, blank=True)
+    description = models.TextField(null=False, blank=True)
     category = models.CharField(max_length=255)
-    tags = models.TextField(null=False, blank=False)
+    tags = models.TextField(null=False, blank=True)
 
-    time_prep = models.TimeField(auto_now=False, auto_now_add=False)
-    time_cook = models.TimeField(auto_now=False, auto_now_add=False)
-    time_tot = models.TimeField(auto_now=False, auto_now_add=False)
+    time_prep = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
+    time_cook = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
+    time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
 
-    directions = models.TextField(null=False, blank=False)
-    author = models.CharField(max_length=255, null=True, blank=False)
-    owner = models.CharField(max_length=255, null=True, blank=False)
+    directions = models.TextField(null=False, blank=True)
+    author = models.CharField(max_length=255, null=True, blank=True)
+    owner = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(upload_to='recipe_img', null=True, blank=True)
 
     def __unicode__(self):

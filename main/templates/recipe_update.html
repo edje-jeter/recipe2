@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block body %}
+
+    <div class="container">        
+        <div class="row">
+            <div class="box">
+
+                <div>
+                    <h1>Create or Edit a Recipe</h1>
+                </div>
+
+                <div>
+                    {% if recipe.name %}
+
+                        <span id='name-display'>
+                            Name: 
+                            <h4>
+                                {{ recipe.name }}
+                                <a id='name-edit-btn'
+                                   class='btn btn-primary'
+                                   href='#' 
+                                   role='button'>Edit Recipe Name
+                                </a>
+                            </h4>
+                        </span>
+
+                    {% else %}
+
+                        <span id='name-edit'>
+                        <h4>Add a Name:</h4>
+                        <input id='name-input-box'
+                               type='text'
+                               value='{{ recipe.name }}'>
+                        </input>
+                        </span>
+
+                    {% endif %}
+                    <hr>
+                </div>
+
+                <div>
+                    Name: {{ recipe.name }}<br>
+                    PK: {{ recipe.pk }}<br>
+                    Description: {{ recipe.description }}<br>
+                    Category: {{ recipe.category }}<br>
+                    Directions: {{ recipe.directions }}<br>
+                    <hr>
+                    Ingredients: <br>
+                    {% for quant in recipe.quantity_set.all %}
+                        {{ quant.handle }} | {{ quant.ingred}} | {{ quant.quant }}<br>
+                    {% endfor %}
+
+                    Add an Ingredient: <br>
+                </div>
+
+                <div class='col-lg-3'
+                           'col-md-3'
+                           'col-sm-4'
+                           'col-xs-12'>
+                    <input id='test-input' type='text'></input>
+                </div>
+
+                <div class='col-lg-6'
+                           'col-md-6'
+                           'col-sm-6'
+                           'col-xs-12'>
+                    <p id='output'></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery.js' %}"></script>
+
+    <script type="text/javascript">
+
+        // Display input box to edit name of recipe
+        $('#name-edit-btn').on('click', function() {
+            $('#name-display').text('').append(
+                    "<h4>Edit the Recipe Name:</h4>" +
+                    "<input id='name-append-input-box'" +
+                           "type='text'" +
+                           "value='{{ recipe.name }}'>" +
+                    "</input> " +
+                    "<a id='name-save-btn'" +
+                       "class='btn btn-primary'" +
+                       "href='#'" +
+                       "role='button'>Save Changes to Recipe Name" +
+                    "</a>"
+                );
+            nameSave();
+        });
+
+        // // Accept and save edited name of recipe
+        // var nameSave = function() {
+        //     $('#name-save-btn').on('click', function() {
+        //         $.ajax({
+        //             type: 'GET',
+        //             url: '/recipe_name_edit_func/' + {{ recipe.pk }},
+        //             data: { name_edited: $('#name-append-input-box').val() },
+        //             error: function() {},
+        //             success: function() {
+        //                 $('#name-display').text('').append(
+        //                     "You have successfully changed the recipe's name.")
+        //             }
+        //         });
+        //     });
+        // };
+
+        // Accept and save edited name of recipe
+        var nameSave = function() {
+            $('#name-save-btn').on('click', function() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
+                    data: { attr: 'name',
+                            new_value: $('#name-append-input-box').val(),
+                           },
+                    error: function() {},
+                    success: function() {
+                        $('#name-display').text('').append(
+                            "You have successfully changed the recipe's name.")
+                    }
+                });
+            });
+        };
+
+        // Generate list of Ingredients in NDB Database
+        $('#test-input').on('keyup', function() {
+
+            $('#output').text('');
+
+            $.ajax({
+                type: 'GET',
+                url: '/json_ingred_ndb/',
+                data: { search: $('#test-input').val() },
+                error: function() {},
+                success: function(data) {
+                    for(i = 0; i < data.length; i++) {
+                        $('#output').append('<li class="ndb-ingred">' +
+                                            data[i][0] +
+                                            ': ' +
+                                            data[i][1] +
+                                            '</li>'
+                                            );
+                    }
+                }
+            });
+        });
+
+        // Display form/measurement options for individual item in NDB list
+        $('#output').on('click', '.ndb-ingred', function() {
+
+            var num_and_desc = $(this).context.innerText
+            console.log($(this))
+
+            $('#output').text(num_and_desc);
+            
+            $.ajax({
+                type: 'GET',
+                url: '/json_ingred_nutr/',
+                data: {search2: num_and_desc.split(': ')[0] },
+                error: function() {},
+                success: function(data) {
+                    for(i=0; i < data.length; i++) {
+                        $('#output').append('<li class="nutr-ingred">' +
+                                            data[i] +
+                                            '</li>'
+                                            );
+                    }
+                }
+            })
+        });
+
+        // Add selected ingredient and measure to recipe
+        $('#output').on('click', '.nutr-ingred', function() {
+
+            var num_and_desc = $(this).context.innerText
+            console.log(num_and_desc)
+        });
+
+
+    </script>
+
+{% endblock body %}

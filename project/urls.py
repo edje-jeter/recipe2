@@ -6,9 +6,13 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^temp/$', 'main.views.Temp', name='temp'),
-    url(r'^json_response/$', 'main.views.json_response', name='json_response'),
-    url(r'^json_measures/$', 'main.views.json_measures', name='json_measures'),
+    url(r'^recipe_update/(?P<pk>\d+)/$', 'main.views.RecipeUpdate', name='recipe_update'),
+    url(r'^json_ingred_ndb/$', 'main.views.JsonIngredNDB', name='json_ingred_ndb'),
+    url(r'^json_ingred_nutr/$', 'main.views.JsonIngredNutr', name='json_ingred_nutr'),
+
+    url(r'^recipe_create/$', 'main.views.RecipeCreateFunc', name='recipe_create'),
+    url(r'^recipe_name_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_name_edit_func', name='recipe_name_edit_func'),
+    url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
 
     url(r'^ingred_ndb_list/$', 'main.views.IngredNDBListView', name='ingred_ndb_list'),
     url(r'^ingred_ndb_detail/(?P<pk>\d+)/$', 'main.views.IngredNDBDetailView', name='ingred_ndb_detail'),

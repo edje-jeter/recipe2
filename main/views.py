@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
+from django.core.urlresolvers import reverse
+
 from main.forms import RecipeAddForm, RecipeEditForm
 from main.forms import IngredAddForm
 from main.forms import UserSignUp, UserSignIn
@@ -46,114 +48,76 @@ def NDBQuery(ndb_no):
     return nutr_list
 
 
-# ---- IngredNDB Detail ---------------------------------------------
-def IngredNDBDetailView(request, pk):
-
-    context = {}
-
-    ingred = IngredNDB.objects.get(pk=pk)
-    context['ingred_v'] = ingred
-
-    nutr_list = NDBQuery(ingred.ndb_no)
-
-    # ---- Populate full nutrition info -----------------------------
-    a = []
-    for nutr in nutr_list:
-        a.append([nutr['name'], nutr['value'], nutr['unit']])
-
-    context['nutr_list'] = a
-
-    # nutrient_id_list: The nutrients I have chosen to show with recipes.
-    # Water: 255; Energy (kcal): 208; Protein: 203; Total Lipid (fat): 204;
-    # Carbohydrate, by difference: 205; Fiber, total dietary: 291;
-    # Sugars, total: 269; Sodium: 307. It's inside the for loop so that it
-    # resets each time we go through the loop
-    nutrient_id_list = [255, 208, 203, 204, 205, 291, 269, 307]
+# ---- Get Standard Nutrition info ----------------------------------
+def GetNutrInfo(nutr_list):
+    """nutrient_id_list: The nutrients I have chosen to show with recipes.
+    Water: 255; Energy (kcal): 208; Protein: 203; Total Lipid (fat): 204;
+    Carbohydrate, by difference: 205; Fiber, total dietary: 291;
+    Sugars, total: 269; Sodium: 307. They are listed in the order they
+    appear in the json. The energy from protein, carbohydrates, and fat
+    are calculated with a 4:4:9 proportion. Since protein and carbohydrates
+    have the same value, I am using energy_ptn to represent both. The
+    id numbers for the calculated energies are my own; the do not come from
+    NDB. nutrient_id_list = [255, 208, 203, 204, 205, 291, 269, 307] """
 
     #  Initialize the variables
-    water = 0
-    protein = 0
-    lipids = 0
-    carbs = 0
-    fiber = 0
-    sugars = 0
-    sodium = 0
+    full_nutr_info = []
+    basic_nutr_info = {255: ['water', 0],
+                       208: ['energy_tot', 0],
+                       203: ['protein', 0],
+                       204: ['lipids', 0],
+                       205: ['carbs', 0],
+                       291: ['fiber', 0],
+                       269: ['sugars', 0],
+                       307: ['sodium', 0],
+                       998: ['energy_ptn', 0],
+                       999: ['energy_fat', 0],
+                       }
 
-    energy_tot = 0
-    energy_ptn = 0
-    energy_cho = 0
-    energy_fat = 0
-
-    # Get the basic nutritional info for the ingredient
+    # Get the nutritional info for the ingredient
     for nutr in nutr_list:
+        full_nutr_info.append([nutr['name'], nutr['value'], nutr['unit']])
 
         nutr_id = int(nutr['nutrient_id'])
-        # print "nutr_id: %s" % nutr_id
 
-        # print "nutr_id_list: %s" % nutrient_id_list
-        if nutrient_id_list == []:
-            break
+        if nutr_id in basic_nutr_info:
+            basic_nutr_info[nutr_id][1] = float(nutr['value'])
 
-        if nutr_id in nutrient_id_list:
-            # print "checkpoint 1"
-            if nutr_id == 255:
-                water = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
-                # print "water: %s" % water
+    energy_tot = basic_nutr_info[208][1]
 
-            elif nutr_id == 203:
-                protein = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
+    basic_nutr_info[998][1] = energy_tot * 4 / 17
+    basic_nutr_info[999][1] = energy_tot * 9 / 17
 
-            elif nutr_id == 204:
-                lipids = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
+    return [basic_nutr_info, full_nutr_info]
 
-            elif nutr_id == 205:
-                carbs = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
-                # print "carbs: %s" % carbs
 
-            elif nutr_id == 291:
-                fiber = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
+# ---- Make a list of Forms/Units -----------------------------------
+def GetMeasures(measures):
 
-            elif nutr_id == 269:
-                sugars = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
-                # print "sugars: %s" % sugars
+    measures_list = []
 
-            elif nutr_id == 307:
-                sodium = float(nutr['value'])
-                nutrient_id_list.remove(nutr_id)
-
-            elif nutr_id == 208:
-                en_tot = int(nutr['value'])
-                energy_tot = en_tot
-
-                energy_ptn = en_tot * 4 / 17
-                energy_cho = energy_ptn
-                energy_fat = en_tot * 9 / 17
-
-                nutrient_id_list.remove(nutr_id)
-
-        else:
-            pass
-
-    # ---- Populate measurement info --------------------------------
-    b = []
-    measures = nutr_list[0]['measures']
     for mea in measures:
         eqv = mea['eqv']
         qty = mea['qty']
         label = mea['label']
+
+        measures_list.append([eqv, qty, label])
+
+    return measures_list
+
+
+def MakeNewIngredNutr(ingred, measures, basic_nutr_info):
+    for mea in measures:
+
+        eqv = mea['eqv']
+        qty = mea['qty']
+        label = mea['label']
+
         num = ingred.ndb_no
         desc = ingred.ndb_description
         handle = ' '.join([num, desc, str(qty), label])
-        # print handle
 
         prop = eqv / 100
-        print prop
 
         ingred_nutr, created = IngredNutr.objects.get_or_create(handle=handle,
                                                                 ndb_id=ingred)
@@ -162,27 +126,128 @@ def IngredNDBDetailView(request, pk):
         ingred_nutr.qty = qty
         ingred_nutr.label = label
 
-        ingred_nutr.water = water * prop
-        ingred_nutr.protein = protein * prop
-        ingred_nutr.lipids = lipids * prop
-        ingred_nutr.carbs = carbs * prop
-        ingred_nutr.fiber = fiber * prop
-        ingred_nutr.sugars = sugars * prop
-        ingred_nutr.sodium = sodium * prop
+        ingred_nutr.water = basic_nutr_info[255][1] * prop
+        ingred_nutr.protein = basic_nutr_info[203][1] * prop
+        ingred_nutr.lipids = basic_nutr_info[204][1] * prop
+        ingred_nutr.carbs = basic_nutr_info[205][1] * prop
+        ingred_nutr.fiber = basic_nutr_info[291][1] * prop
+        ingred_nutr.sugars = basic_nutr_info[269][1] * prop
+        ingred_nutr.sodium = basic_nutr_info[307][1] * prop
 
-        ingred_nutr.energy_tot = energy_tot * prop
-        ingred_nutr.energy_ptn = energy_ptn * prop
-        ingred_nutr.energy_cho = energy_cho * prop
-        ingred_nutr.energy_fat = energy_fat * prop
+        ingred_nutr.energy_tot = basic_nutr_info[208][1] * prop
+        ingred_nutr.energy_ptn = basic_nutr_info[998][1] * prop
+        ingred_nutr.energy_fat = basic_nutr_info[999][1] * prop
 
         ingred_nutr.save()
 
-        b.append([mea['eqv'], qty, label])
+    return created
 
-    context['measures'] = b
+
+# ---- IngredNDB Detail ---------------------------------------------
+def IngredNDBDetailView(request, pk):
+
+    context = {}
+
+    ingred = IngredNDB.objects.get(pk=pk)
+    context['ingred_v'] = ingred
+
+    # Retrieve list of nutrients from NDB API
+    nutr_list = NDBQuery(ingred.ndb_no)
+    measures = nutr_list[0]['measures']
+
+    # Extract Basic [0] and Full [1] Nutrition Info from nutr_list
+    nutr_info = GetNutrInfo(nutr_list)
+
+    context['nutr_list'] = nutr_info[1]
+    context['measures'] = GetMeasures(measures)
+
+    # Get or Create new IngredNutr(s) (ie, I have not pre-populated the
+    # IngredNutr database; as the user looks at ingredients they get saved
+    # in the database and subsequent views come from the db and not API.)
+    MakeNewIngredNutr(ingred, measures, nutr_info[0])
 
     return render_to_response('ingred_ndb_detail.html', context,
                               context_instance=RequestContext(request))
+
+
+#  ---- Adding Ingredients to a Recipe ------------------------------
+def JsonIngredNDB(request):
+    search_string = request.GET.get('search', '')
+
+    objects = IngredNDB.objects.filter(
+        ndb_description__icontains=search_string
+        )
+
+    object_list = []
+    for obj in objects:
+        object_list.append([obj.ndb_no, obj.ndb_description])
+
+    return JsonResponse(object_list, safe=False)
+
+
+def JsonIngredNutr(request):
+    ndb_no = request.GET.get('search2', '')
+
+    nutr_list = NDBQuery(ndb_no)
+
+    ingred = IngredNDB.objects.get(ndb_no=ndb_no)
+    measures = nutr_list[0]['measures']
+    nutr_info = GetNutrInfo(nutr_list)
+    MakeNewIngredNutr(ingred, measures, nutr_info[0])
+
+    objects = IngredNutr.objects.filter(
+        handle__icontains=ndb_no
+        )
+
+    object_list = []
+    for obj in objects:
+        object_list.append(obj.label)
+
+    return JsonResponse(object_list, safe=False)
+
+
+def RecipeUpdate(request, pk):
+
+    context = {}
+    recipe = Recipe.objects.get(pk=pk)
+    context['recipe'] = recipe
+
+    return render_to_response('recipe_update.html', context,
+                              context_instance=RequestContext(request))
+
+
+def RecipeCreateFunc(request):
+
+    owner = str(request.user.username)
+    recipe = Recipe.objects.create(owner=owner)
+    url = reverse('recipe_update', args=([recipe.id]))
+
+    return HttpResponseRedirect(url)
+
+
+def recipe_name_edit_func(request, pk):
+
+    name_edited = request.GET.get('name_edited', '')
+    recipe = Recipe.objects.get(pk=pk)
+    recipe.name = name_edited
+    recipe.save()
+
+    return HttpResponse(status=200)
+
+
+def recipe_attr_edit_func(request, pk):
+
+    attr = request.GET.get('attr', '')
+    print attr
+    new_value = request.GET.get('new_value', '')
+    print new_value
+    recipe = Recipe.objects.get(pk=pk)
+
+    setattr(recipe, attr, new_value)
+
+    recipe.save()
+
+    return HttpResponse(status=200)
 
 
 # ---- Recipe List --------------------------------------------------
@@ -545,41 +610,3 @@ def vote_stats_func(request, pk):
     vote_stat.save()
 
     return HttpResponseRedirect('/recipe_detail/%s' % pk)
-
-
-#  ---- Adding Ingredients to a Recipe ------------------------------
-def json_response(request):
-    search_string = request.GET.get('search', '')
-
-    objects = IngredNDB.objects.filter(
-        ndb_description__icontains=search_string
-        )
-
-    object_list = []
-    for obj in objects:
-        object_list.append(obj.ndb_description)
-
-    return JsonResponse(object_list, safe=False)
-
-
-def json_measures(request):
-    search_string = request.GET.get('search2', '')
-
-    print search_string
-    objects = IngredNutr.objects.filter(
-        handle__icontains=search_string
-        )
-
-    object_list = []
-    for obj in objects:
-        object_list.append(obj.label)
-
-    return JsonResponse(object_list, safe=False)
-
-
-def Temp(request):
-
-    context = {}
-
-    return render_to_response('temp.html', context,
-                              context_instance=RequestContext(request))
