@@ -1,5 +1,4 @@
 import requests
-import re
 
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -186,24 +185,6 @@ def JsonIngredNDB(request):
     return JsonResponse(object_list, safe=False)
 
 
-# Currently does not remove duplicates from output
-def json_ingred_ndb_2(request):
-    search_text = request.GET.get('search', '')
-    object_list = []
-
-    rgx = re.compile("(\w[\w']*\w|\w)")
-    search_list = rgx.findall(search_text)
-
-    for search in search_list:
-        objects = IngredNDB.objects.filter(
-            ndb_description__icontains=search
-        )
-        for obj in objects:
-            object_list.append([obj.ndb_no, obj.ndb_description])
-
-    return JsonResponse(object_list, safe=False)
-
-
 def JsonIngredNutr(request):
     ndb_no = request.GET.get('search2', '')
 
@@ -244,10 +225,22 @@ def RecipeCreateFunc(request):
     return HttpResponseRedirect(url)
 
 
+def recipe_name_edit_func(request, pk):
+
+    name_edited = request.GET.get('name_edited', '')
+    recipe = Recipe.objects.get(pk=pk)
+    recipe.name = name_edited
+    recipe.save()
+
+    return HttpResponse(status=200)
+
+
 def recipe_attr_edit_func(request, pk):
 
     attr = request.GET.get('attr', '')
+    print attr
     new_value = request.GET.get('new_value', '')
+    print new_value
     recipe = Recipe.objects.get(pk=pk)
 
     setattr(recipe, attr, new_value)
@@ -256,23 +249,6 @@ def recipe_attr_edit_func(request, pk):
 
     return HttpResponse(status=200)
 
-
-def recipe_attr_edit_func2(request, pk):
-
-    attr = request.GET.get('attr', '')
-    new_value = request.GET.get('new_value', '')
-
-    recipe = Recipe.objects.get(pk=pk)
-    ingred = IngredNutr.objects.get()
-    # quantity_obj = Quantity.objects.create(recipe=recipe)
-
-    # setattr(recipe, attr, new_value)
-    # recipe.save()
-
-    return HttpResponse(status=200)
-
-
-# Recipe.objects.get(pk=pk).Quantity.common_name = new_common_name
 
 # ---- Recipe List --------------------------------------------------
 def RecipeListView(request):

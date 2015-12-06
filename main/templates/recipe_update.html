@@ -11,55 +11,80 @@
                 </div>
 
                 <div>
-                    {% if recipe.name %}
-
-                        <span id='name-display'>
-                            Name: 
-                            <h4>
-                                {{ recipe.name }}
+                    <span id='name-display'>
+                        Name: <h4>{{ recipe.name }}
                                 <a id='name-edit-btn'
                                    class='btn btn-primary'
                                    href='#' 
-                                   role='button'>Edit Recipe Name
-                                </a>
-                            </h4>
-                        </span>
-
-                    {% else %}
-
-                        <span id='name-edit'>
-                        <h4>Add a Name:</h4>
-                        <input id='name-input-box'
-                               type='text'
-                               value='{{ recipe.name }}'>
-                        </input>
-                        </span>
-
-                    {% endif %}
+                                   role='button'>Edit Name
+                                </a></h4>
+                    </span>
                     <hr>
                 </div>
 
                 <div>
-                    Name: {{ recipe.name }}<br>
-                    PK: {{ recipe.pk }}<br>
-                    Description: {{ recipe.description }}<br>
-                    Category: {{ recipe.category }}<br>
-                    Directions: {{ recipe.directions }}<br>
+{% comment %} <!--
+                    <span id='des-display'>
+                    Description: {{ recipe.description }}
+                                <a id='des-edit-btn'
+                                   class='btn btn-primary'
+                                   href='#' 
+                                   role='button'>Edit Description
+                                </a>
+                    <br>
+                    </span>
+
+                    <span id='cat-display'>
+                    Category: {{ recipe.category }}
+                                <a id='cat-edit-btn'
+                                   class='btn btn-primary'
+                                   href='#' 
+                                   role='button'>Edit Category
+                                </a>
+                    <br>
+                    </span>
+
+                    <span id='dir-display'>
+                    Directions: {{ recipe.directions }}
+                                <a id='dir-edit-btn'
+                                   class='btn btn-primary'
+                                   href='#' 
+                                   role='button'>Edit Directions
+                                </a>
+                    <br>
+                    </span>
+--> {% endcomment %}
                     <hr>
                     Ingredients: <br>
                     {% for quant in recipe.quantity_set.all %}
                         {{ quant.handle }} | {{ quant.ingred}} | {{ quant.quant }}<br>
                     {% endfor %}
+                    <span id='ingred-list-output-1'>
+                    </span>
 
-                    Add an Ingredient: <br>
+                    <span id='ingred-list-output-2'>
+                    <a id='ingred-add-btn'
+                       class='btn btn-primary'
+                       href='#' 
+                       role='button'>Add Ingredient
+                    </a>
+                    </span>
+
+                    <br>
+
                 </div>
 
                 <div class='col-lg-3'
                            'col-md-3'
                            'col-sm-4'
                            'col-xs-12'>
-                    <input id='test-input' type='text'></input>
+                    <span id='handle-display'>
+                    </span>
                 </div>
+
+                <br>
+                Find the best match in the NDB:
+                <input id='test-input' type='text'></input>
 
                 <div class='col-lg-6'
                            'col-md-6'
@@ -75,6 +100,112 @@
     <script src="{% static 'js/jquery.js' %}"></script>
 
     <script type="text/javascript">
+
+        // Display input box to edit common name of recipe
+        $('#ingred-add-btn').on('click', function() {
+            var btnID = 'ingred-common-name-add-btn'
+            var btnText = 'Add Ingredient Common Name'
+            var inputID = 'common-name-input'
+            var attribute = 'common_name'
+
+            $('#ingred-list-output-2').text('').append(  
+                "<hr>" +
+                "Enter the ingredient common-name: " +
+                "<input id=" + inputID + " type='text'></input> " +
+                "<a id='" + btnID + "'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>" + btnText +
+                "</a>"
+            );
+            commonNameSave(inputID, btnID, attribute);
+        });
+
+        // Accept and save edited common name of recipe
+        var commonNameSave = function(inputID, btnID, attribute) {
+            $('#' + btnID).on('click', function() {
+                var inputText = $('#' + inputID).val()
+                console.log("inputText: " + inputText)
+                
+                $('#ingred-list-output-1').text('').append(inputText)
+
+                $('#ingred-list-output-2').text('').append(
+                    "<hr>" +
+                    "You have entered the common name; now match " +
+                    "the ingredient to its entry in the NDB by clicking " +
+                    "one of the list items below."
+                );
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/json_ingred_ndb_2/',
+                    data: { search: inputText },
+                    error: function() {},
+                    success: function(data) {
+                        for(i = 0; i < data.length; i++) {
+                            $('#ingred-list-output-2').append(
+                                '<li class="ndb-ingred">' +
+                                data[i][0] +
+                                ': ' +
+                                data[i][1] +
+                                '</li>'
+                            );
+                        }
+                    }
+                });
+            });
+        };
+
+        // Add selected item from NDB list to output
+        $('#ingred-list-output-2').on('click', '.ndb-ingred', function() {
+
+            var num_and_desc = $(this).context.innerText
+            console.log(num_and_desc)
+
+            $('#ingred-list-output-1').append(" | " + num_and_desc)
+            $('#ingred-list-output-2').text('').append(
+                "<hr>" +
+                "You have matched the ingredient to the database; now choose " +
+                "its form and/or unit of measurement by clicking on " +
+                "one of the list items below."
+            );
+
+            $.ajax({
+                type: 'GET',
+                url: '/json_ingred_nutr/',
+                data: {search2: num_and_desc.split(': ')[0] },
+                error: function() {},
+                success: function(data) {
+                    for(i=0; i < data.length; i++) {
+                        $('#ingred-list-output-2').append(
+                            '<li class="nutr-ingred">' +
+                            data[i] +
+                            '</li>'
+                        );
+                    }
+                }
+            });
+        });
+
+        // Add selected item from units/forms list to output
+        $('#ingred-list-output-2').on('click', '.nutr-ingred', function() {
+
+            var form_or_unit = $(this).context.innerText
+            console.log(form_or_unit)
+
+            $('#ingred-list-output-1').append(" | " + form_or_unit)
+            $('#ingred-list-output-2').text('').append(
+                "<hr>" +
+                "You have chosen the form/unit; now specify " +
+                "the quantity: " +
+                "<input id='quantity-input-box' type='text'></input>" +
+                "<a id='quantity-save-btn'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>Save Quantity" +
+                "</a>"
+            );
+        });
 
         // Display input box to edit name of recipe
         $('#name-edit-btn').on('click', function() {
@@ -92,22 +223,6 @@
                 );
             nameSave();
         });
-
-        // // Accept and save edited name of recipe
-        // var nameSave = function() {
-        //     $('#name-save-btn').on('click', function() {
-        //         $.ajax({
-        //             type: 'GET',
-        //             url: '/recipe_name_edit_func/' + {{ recipe.pk }},
-        //             data: { name_edited: $('#name-append-input-box').val() },
-        //             error: function() {},
-        //             success: function() {
-        //                 $('#name-display').text('').append(
-        //                     "You have successfully changed the recipe's name.")
-        //             }
-        //         });
-        //     });
-        // };
 
         // Accept and save edited name of recipe
         var nameSave = function() {

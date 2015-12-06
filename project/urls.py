@@ -8,11 +8,12 @@ urlpatterns = [
 
     url(r'^recipe_update/(?P<pk>\d+)/$', 'main.views.RecipeUpdate', name='recipe_update'),
     url(r'^json_ingred_ndb/$', 'main.views.JsonIngredNDB', name='json_ingred_ndb'),
+    url(r'^json_ingred_ndb_2/$', 'main.views.json_ingred_ndb_2', name='json_ingred_ndb_2'),
     url(r'^json_ingred_nutr/$', 'main.views.JsonIngredNutr', name='json_ingred_nutr'),
 
     url(r'^recipe_create/$', 'main.views.RecipeCreateFunc', name='recipe_create'),
-    url(r'^recipe_name_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_name_edit_func', name='recipe_name_edit_func'),
     url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
+    url(r'^recipe_attr_edit_func2/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func2', name='recipe_attr_edit_func2'),
 
     url(r'^ingred_ndb_list/$', 'main.views.IngredNDBListView', name='ingred_ndb_list'),
     url(r'^ingred_ndb_detail/(?P<pk>\d+)/$', 'main.views.IngredNDBDetailView', name='ingred_ndb_detail'),
