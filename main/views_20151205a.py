@@ -16,7 +16,7 @@ from main.forms import IngredAddForm
 from main.forms import UserSignUp, UserSignIn
 from main.forms import CommentForm
 
-from main.models import IngredNDB, IngredNutr, Recipe, Quantity
+from main.models import IngredNDB, IngredNutr, Recipe
 from main.models import Comment, Vote, VoteStat
 
 
@@ -206,10 +206,8 @@ def json_ingred_ndb_2(request):
 
 def JsonIngredNutr(request):
     ndb_no = request.GET.get('search2', '')
-    # print "ndb_no: %s" % ndb_no
 
     nutr_list = NDBQuery(ndb_no)
-    # print "nutr_list: %s" % nutr_list
 
     ingred = IngredNDB.objects.get(ndb_no=ndb_no)
     measures = nutr_list[0]['measures']
@@ -222,7 +220,7 @@ def JsonIngredNutr(request):
 
     object_list = []
     for obj in objects:
-        object_list.append([obj.qty, obj.label])
+        object_list.append(obj.label)
 
     return JsonResponse(object_list, safe=False)
 
@@ -232,71 +230,6 @@ def RecipeUpdate(request, pk):
     context = {}
     recipe = Recipe.objects.get(pk=pk)
     context['recipe'] = recipe
-
-    nutr_basic_g = {'water': 0,
-                    'protein': 0,
-                    'lipids': 0,
-                    'carbs': 0,
-                    'fiber': 0,
-                    'sugars': 0,
-                    }
-
-    nutr_other_mg = {'sodium': 0}
-
-    energy_basic = {'energy_tot': 0,
-                    'energy_ptn': 0,
-                    'energy_fat': 0,
-                    }
-
-    # Retrieve and sum nutrition values for each nutrient in each ingredient
-    for quant in recipe.quantity_set.all():
-        # ndb_no = ingred.ingred.ndb_id.ndb_no
-        # nutr_list = NDBQuery(ndb_no)
-
-        # print quant.qty_common
-        # print quant.ingred.label
-        # print quant.name_common
-
-        qty_prop = quant.qty_prop
-        servings = quant.recipe.servings_orig
-
-        for nutr in nutr_basic_g:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_basic_g[nutr] += nutr_value * qty_prop
-
-        for nutr in nutr_other_mg:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_other_mg[nutr] += nutr_value * qty_prop
-
-        for energy in energy_basic:
-            energy_value = getattr(quant.ingred, energy)
-            energy_basic[energy] += energy_value * qty_prop
-
-    # Account for servings per recipe, round all values
-    # to ones' place and calculate total mass
-    mass_basic = 0
-    for nutr in nutr_basic_g:
-        mass = nutr_basic_g[nutr] / servings
-        nutr_basic_g[nutr] = int(round(mass, 0))
-        mass_basic += mass
-
-    for nutr in nutr_other_mg:
-        mass = nutr_other_mg[nutr] / servings
-        nutr_other_mg[nutr] = int(round(mass, 0))
-        mass_basic += mass / 1000
-
-    for energy in energy_basic:
-        energy_basic[energy] = int(round(energy_basic[energy] / servings, 0))
-
-    mass_basic = int(round(mass_basic, 0))
-
-    context['nutr_basic'] = nutr_basic_g
-    context['nutr_other'] = nutr_other_mg
-    context['energy_basic'] = energy_basic
-    context['mass_basic'] = mass_basic
-
-    recipe.calories_tot = energy_basic['energy_tot']
-    recipe.save()
 
     return render_to_response('recipe_update.html', context,
                               context_instance=RequestContext(request))
@@ -326,38 +259,20 @@ def recipe_attr_edit_func(request, pk):
 
 def recipe_attr_edit_func2(request, pk):
 
-    name_common = request.GET.get('name_common', '')
-    ndb_num = request.GET.get('ndb_num', '')
-    ndb_desc = request.GET.get('ndb_desc', '')
-    ndb_quant = request.GET.get('ndb_quant', '')
-    form_or_unit = request.GET.get('form_or_unit', '')
-    qty_common_str = str(request.GET.get('qty_common', ''))
-
-    quant_handle = ' '.join([ndb_num, pk, name_common])
+    attr = request.GET.get('attr', '')
+    new_value = request.GET.get('new_value', '')
 
     recipe = Recipe.objects.get(pk=pk)
-    ingred_ndb = IngredNDB.objects.get(ndb_no=ndb_num)
-    ingred_nutr = IngredNutr.objects.filter(
-        handle__icontains=ndb_num).filter(
-        handle__icontains=form_or_unit).filter(
-        handle__icontains=ndb_quant[0:2])[0]
+    ingred = IngredNutr.objects.get()
+    # quantity_obj = Quantity.objects.create(recipe=recipe)
 
-    quant_obj, created = Quantity.objects.get_or_create(
-        recipe=recipe,
-        ingred=ingred_nutr,
-        handle=quant_handle
-        )
-
-    quant_obj.qty_common = qty_common_str
-    quant_obj.name_common = name_common
-
-    qty_prop = round(float(qty_common_str) / float(ingred_nutr.qty), 3)
-    quant_obj.qty_prop = qty_prop
-
-    quant_obj.save()
+    # setattr(recipe, attr, new_value)
+    # recipe.save()
 
     return HttpResponse(status=200)
 
+
+# Recipe.objects.get(pk=pk).Quantity.common_name = new_common_name
 
 # ---- Recipe List --------------------------------------------------
 def RecipeListView(request):

@@ -24,7 +24,7 @@ class IngredNutr(models.Model):
     handle = models.CharField(max_length=255, null=False, blank=True)
 
     eqv = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
-    qty = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
+    qty = models.DecimalField(default=1, max_digits=7, decimal_places=3, null=False, blank=True)
     label = models.CharField(max_length=255, null=False, blank=True)
 
     # Amount (in g [Sodium: mg]) of key components in 100g of Ingredient
@@ -54,7 +54,10 @@ class Recipe(models.Model):
     description = models.TextField(null=False, blank=True)
     category = models.CharField(max_length=255)
     tags = models.TextField(null=False, blank=True)
+    servings_orig = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
+    servings_scaled = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
 
+    calories_tot = models.IntegerField(default=0, null=False, blank=True)
     time_prep = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
     time_cook = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
     time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
@@ -74,10 +77,12 @@ class Quantity(models.Model):
     ingred = models.ForeignKey(IngredNutr)
     recipe = models.ForeignKey(Recipe)
 
-    common_name = models.CharField(max_length=255, null=False, blank=True)
+    name_common = models.CharField(max_length=255, null=False, blank=True)
 
     # The amount of the ingred, in the units specified in IngredNutr
-    quant = models.DecimalField(default=0, max_digits=6, decimal_places=2, null=False, blank=True)
+    qty_common = models.CharField(max_length=5, null=False, blank=True)
+    qty_prop = models.DecimalField(default=1, max_digits=7, decimal_places=3, null=False, blank=True)
+    qty_scaled = models.DecimalField(default=1, max_digits=7, decimal_places=3, null=False, blank=True)
 
     def __unicode__(self):
         return self.handle

@@ -28,3 +28,14 @@ p {
     margin: 12px;
 
 }
+
+#nutrition-info {
+    border-collapse: separate;
+    border-spacing: 7px 0px;
+}
+
+.blank-row
+{
+    height: 10px !important; /* Overwrite any previous rules */
+    background-color: #FFFFFF;
+}
