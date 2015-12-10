@@ -12,7 +12,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Recipe Organizer</title>
+    <title>Edje's Recipe Organizer</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
@@ -35,7 +35,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/home/">Recipe Organizer</a>
+                <a class="navbar-brand" href="/about/">Edje's Recipe Organizer</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -47,11 +47,12 @@
                         <a href="/recipe_list/">Recipes</a>
                     </li>
                     <li>
-                        <a href="/ingred_list/">Ingredients</a>
+                        <a href="/ingred_ndb_list/">Ingredients</a>
                     </li>
-                    <li>
+{% comment %}                    <li>
                         <a href="/category_list/">Categories</a>
                     </li>
+{% endcomment %}
                     <li>
                         {% if user.is_anonymous %}
                             <a href="{% url 'sign_in_v' %}">Login</a>
@@ -97,7 +98,7 @@
                     >
                     <a href="/recipe_list/">Go to Recipe List</a> --- 
 
-                    <a href="/ingred_list/">Go to Ingredient List</a>
+                    <a href="/ingred_ndb_list/">Go to Ingredient List</a>
 
                     <!-- {% comment %}<a class="btn btn-success text-center" 
                        href="/contact_view/"

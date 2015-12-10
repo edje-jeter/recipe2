@@ -1,94 +1,689 @@
+{% extends 'base.html' %}
 
+{% load staticfiles %}
 {% load crispy_forms_tags %}
 
 {% block body %}
 
-    <div class="container">        
-        <div class="row">
-            <div class="box">
+<div class="container">        
+<div class="row"><!-- Name and Header--><div class="box">
 
-                <div class="col-lg-12">
-                    <h1 class="page-header text-center">
-                        <strong>{{ artists.artist_name }}</strong>
-                    </h1>
-                </div>
-                print {{ recipe_v }}
-                <div>
-                    Recipe name: {{ recipe_v.name }}<br>
-                    description: {{ recipe_v.description }}<br>
-                    category: {{ recipe_v.category }}<br>
-                    tags: {{ recipe_v.tags }}<br>
-                    time_prep: {{ recipe_v.time_prep }}<br>
-                    time_cook: {{ recipe_v.time_cook }}<br>
-                    time_tot: {{ recipe_v.time_tot }}<br>
-                    directions: {{ recipe_v.directions }}<br>
-                    author: {{ recipe_v.author }}<br>
-                    owner: {{ recipe_v.owner }}<br>
-                    image: {{ recipe_v.image }}<br>
-                    <hr>
-                </div>
-
-                <div>
-                    <a href="/recipe_edit/{{ recipe_v.pk }}">
-                        Edit this Recipe
-                    </a>
-                     --- 
-                    <a href="/recipe_del_page/{{ recipe_v.pk }}">
-                        Delete Recipe from Database
-                    </a>
-                     --- 
-                    <a href="/recipe_add/">
-                        Add Another Recipe to Database
-                    </a>
-                </div>
-
-                <div>
-                    {% if active %}
-                        vote state = {{ vote_v.state }}
-                        <br>
-                        <a href="/vote_up_func/{{ recipe_v.pk }}">
-                            Vote Up
-                        </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
-                        
-                        <a href="/vote_dn_func/{{ recipe_v.pk }}">
-                            Vote Down
-                        </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
-
-                    {% else %}
-                        You must be signed-in to vote <br>
-                        ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
-                        ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
-
-                    {% endif %}
-
-                </div>
-
-                <div>
-                    <hr>
-                    {% for comment in old_comments_v %}
-                        {{ comment.number }}. <br>
-                        {{ comment.text }}<br>
-                        Comment by 
-                        {{ comment.user_name }} --- 
-                        {{ comment.time_stamp }}<hr>
-                    {% endfor %}
-                </div>
-
-                <div>
-                    {% if active %}
-                        {% crispy comments_v %}
-                    {% else %}
-                        You must be signed-in to comment. Please 
-                        <a href="/sign_in/">sign in</a> 
-                        or 
-                        <a href="/sign_in/">create an account</a> 
-                        and sign in.
-                    {% endif %}
-                    <hr>
-                </div>
-
-            </div>
+<!-- /// #Name ////////////////////////////////////////////////// -->
+    <div id="name-section">
+        <div id="name-display"
+             class="col-lg-10
+                    col-md-10">
+            <h1>{{ recipe.name }}</h1>
         </div>
-    </div>
+
+    {% comment %}
+        <div id="name-btn"
+             style="text-align: right"
+             class="col-lg-2
+                    col-md-2">
+            <a id="name-edit-btn"
+               class="btn btn-primary"
+               href="#"
+               role="button">Edit Name
+            </a>
+        </div>
+    {% endcomment %}
+ 
+    </div><!-- /#name-section -->
+
+<!-- /// Name/Header Divider //////////////////////////////// -->
+    <div id="name-header-divider">
+        <hr class="col-xs-12">
+    </div><!-- /#name-header-divider -->
+
+<!-- /// #Header Left Side ////////////////////////////////////// -->
+    <div id="header-left-side"
+         class="col-lg-4
+                col-md-4
+                col-sm-4
+                col-xs-12">
+
+        <img id="image-display"
+             class="col-md-12"
+             src="{{ recipe.image.url }}"
+             alt="testing">
+
+    </div><!-- /#header-left-side -->
+
+<!-- /// #Header Right Side ///////////////////////////////////// -->
+    <div id="header-right-side"
+         class="col-lg-8
+                col-md-8
+                col-sm-12
+                col-xs-12">
+
+    <!-- Key Info ............................................... -->
+        <div id="key-info" class="col-lg-5 col-md-4 col-sm-5 col-xs-12">
+
+            <span class="key-info-col col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <span class="key-info-head">
+                    Time
+                </span><br>
+                <span class="key-info-data">
+                    {{ recipe.time_tot }} mins
+                </span>
+            </span>
+
+            <span class="key-info-col col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <span class="key-info-head">
+                    Energy
+                </span><br>
+                <span class="key-info-data">
+                    {{ energy_basic.energy_tot }} Cal
+                </span>
+            </span>
+
+        </div><!-- /#key-info -->
+
+    <!-- Nutrition Info ......................................... -->
+        <div id="nutr-info" class="col-lg-7 col-md-8 col-sm-7 col-xs-12">
+
+            <div class="key-info-col col-lg-6 col-md-7 col-sm-6 col-xs-12">
+                <table class="nutrition-info">
+                    <tr><td align="right">Carbs: </td>
+                        <td>{{ nutr_basic.carbs }} g ({{ energy_basic.energy_ptn }} Cal)</td></tr>
+                    <tr><td align="right">Protein: </td>
+                        <td>{{ nutr_basic.protein }} g ({{ energy_basic.energy_ptn }} Cal)</td></tr>
+                    <tr><td align="right">Fat: </td>
+                        <td>{{ nutr_basic.lipids }} g ({{ energy_basic.energy_fat }} Cal)</td></tr>
+                </table>
+            </div>
+
+            <div class="key-info-col col-lg-6 col-md-5 col-sm-6 col-xs-12">
+                <table class="nutrition-info">
+                    <tr><td align="right">Fiber: </td>
+                        <td>{{ nutr_basic.fiber }} g</td></tr>
+                    <tr><td align="right">Sugars: </td>
+                        <td>{{ nutr_basic.sugars }} g</td></tr>
+                    <tr><td align="right">Sodium: </td>
+                        <td>{{ nutr_other.sodium }} mg</td></tr>
+                </table>
+            </div>
+
+        </div><!-- /#nutr-info -->
+
+    <!-- Nutr/Voting Divider ...................................... -->
+        <div id="nutr-voting-divider">
+            <hr class="col-xs-12">
+        </div><!-- /#nutr-voting-divider -->
+
+    <!-- Voting ................................................. -->
+        <div id="voting" class="col-xs-12">
+
+            <div id="stars-user">
+            </div>
+
+        <br><br>
+
+            {% if active %}
+                {# vote state = {{ vote_v.state }}<br> #}
+                <a href="/vote_up_func/{{ recipe.pk }}">
+                    Vote Up
+                </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
+                
+                <a href="/vote_dn_func/{{ recipe.pk }}">
+                    Vote Down
+                </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
+
+            {% else %}
+                You must be signed-in to vote <br>
+                ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
+                ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
+
+            {% endif %}
+            
+            <br><br>
+
+        </div><!-- /#voting -->
+
+    <!-- Meta Info .............................................. -->
+        <div id="meta-info" class="col-xs-8">
+            
+            <p class="meta-info-spacer">
+            <span class="meta-info-head">Description:</span><br>
+            <span class="meta-info-data">{{ recipe.description }}</span>
+            </p>
+
+            <p class="meta-info-spacer">
+            <span class="meta-info-head">Tags:</span><br>
+            <span class="meta-info-data">{{ recipe.tags }}</span>
+            </p>
+            
+            <p class="meta-info-spacer">
+            <span class="meta-info-head">Source:</span><br>
+            <span class="meta-info-data">{{ recipe.author }}</span>
+            </p>
+        </div><!-- / Meta Info -->
+
+    <!-- Edit, Delete, Add ...................................... -->
+        <div id="edit-delete-add" class="col-xs-4" style="text-align: right">
+
+            <a id="recipe-edit-btn"
+               class="btn btn-primary"
+               href="/recipe_edit/{{ recipe.pk }}"
+               role="button">Edit Recipe
+            </a>
+            <br><br>
+
+            <a id="recipe-delete-btn"
+               class="btn btn-primary"
+               href="/recipe_delete_page/{{ recipe.pk }}"
+               role="button">Delete Recipe
+            </a>
+            <br><br>
+
+            <a id="recipe-add-btn"
+               class="btn btn-primary"
+               href="/recipe_create/"
+               role="button">Add Recipe
+            </a>
+
+        </div><!-- /#edit-delete-add -->
+
+    </div><!-- /#header-right-side -->
+
+<!-- /// #Header/Section Divider //////////////////////////////// -->
+    <div id="header-section-divider">
+        <hr class="col-xs-12">
+    </div><!-- /#header-section-divide -->
+
+</div><!-- /.box --></div><!-- /.row Name and Header -->
+
+<div class="row"><div class="box">
+
+<!-- /// #Left Side Section ///////////////////////////////////// -->
+    <div id="left-side-section"
+         class="col-lg-6
+                col-md-6">
+        
+    <!-- Ingred List Output 0 ................................... -->
+        <span id="ingred-list-output-0">
+            <h4>
+                Ingredients for 
+                <span id="servings-display"></span>
+                <span id="servings-change"></span>
+            </h4>
+
+            <p class="ingredient-list">
+            {% for quant in recipe.quantity_set.all %}
+                <span class='qty-common'>{{ quant.qty_common }}</span>
+                 {{ quant.ingred.label }}
+                 {{ quant.name_common }}
+                 <br>
+            {% endfor %}
+            </p>
+
+        </span>
+        
+    <!-- Ingred List Output 1 ................................... -->
+        <span id='ingred-list-output-1'>
+        </span>
+        <br>
+
+    <!-- Ingred List Output 2 ................................... -->
+        <span id='ingred-list-output-2'>
+        <a id='ingred-add-btn'
+           class='btn btn-primary'
+           href='#'
+           role='button'>Add Ingredient
+        </a>
+        </span>
+        <br>
+
+    <!-- Ingred List Output 3 ................................... -->
+        <strong id='ingred-list-output-3'>
+        </strong>
+
+    </div><!-- /#left-side-section -->
+
+<!-- /// #Right Side Section //////////////////////////////////// -->
+    <div id="right-side-section"
+         class="col-lg-6
+                col-md-6">
+        
+    <!-- Right Side Head ........................................ -->
+        <h4 id="right-side-head">
+            Basic Nutrition Information per Serving:
+        </h4>
+
+    <!-- Right Side Body ........................................ -->
+        <span id="right-side-body">
+        <table id="nutrition-info" style="width:60%">
+            <tr><td align="right"><b>Total Calories: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
+            <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+            <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+            <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
+            <tr class="blank-row"><td colspan="3"></td></tr>
+            <tr><td align="right"><b>Approximate Mass: </b></td><td><b>{{ mass_basic }} g</b></td></tr>
+            <tr><td align="right">Carbs: </td><td>{{ nutr_basic.carbs }} g</td></tr>
+            <tr><td align="right">Protein: </td><td>{{ nutr_basic.protein }} g</td></tr>
+            <tr><td align="right">Fat: </td><td>{{ nutr_basic.lipids }} g</td></tr>
+            <tr><td align="right">Fiber: </td><td>{{ nutr_basic.fiber }} g</td></tr>
+            <tr><td align="right">Sugars: </td><td>{{ nutr_basic.sugars }} g</td></tr>
+            <tr><td align="right">Water: </td><td>{{ nutr_basic.water }} g</td></tr>
+            <tr><td align="right">Sodium: </td><td>{{ nutr_other.sodium }} mg</td></tr>
+        </table>
+        </span>
+
+    </div><!-- /#right-side-section -->
+
+<!-- /// Section/Bottom Divider ///////////////////////////////// -->
+    <div>
+        <hr class="col-xs-12">
+    </div><!-- /Section Bottom Divider -->
+
+</div><!-- /.box --></div><!-- /.row /Main Section-->
+
+<div class="row"><div class="box">
+
+<!-- /// #Bottom Left Side ///////////////////////////////////// -->
+
+    <div id="bottom-left-side"
+         class="col-lg-6
+                col-md-6">
+
+        <div id="directions-head">
+            <h4>
+                Directions:
+            </h4>
+        </div>
+
+        <div id="directions-display">
+            {{ recipe.directions }}
+            <br>
+        </div>
+
+    </div><!-- /#bottom-left-side-->
+
+<!-- /// #Bottom Right Side ///////////////////////////////////// -->
+    <div id="bottom-right-side"
+         class="col-lg-6
+                col-md-6">
+
+    <!-- Comments Display ....................................... -->
+        <div id="comments-head">
+            <h4>
+                Comments:
+            </h4>
+        </div>
+
+        <div id="comments-display">
+            {% for comment in old_comments_v %}
+                {{ comment.number }}. <br>
+                {{ comment.text }}<br>
+                Comment by 
+                {{ comment.user_name }} --- 
+                {{ comment.time_stamp }}<hr>
+            {% endfor %}
+        </div><!-- /#comments-display -->
+
+    <!-- New Comments ........................................... -->
+        <div id="new-comments">
+
+            {% if active %}
+                {% crispy comments_v %}
+            {% else %}
+                You must be signed-in to comment. Please 
+                <a href="/sign_in/">sign in</a> 
+                or 
+                <a href="/sign_in/">create an account</a> 
+                and sign in.
+            {% endif %}
+
+        </div><!-- /#new-comments -->
+
+    </div><!-- /#bottom-right-side-->
+
+<!-- /// #Bottom/Footer Divider ///////////////////////////////// -->
+    <div>
+        <hr class="col-xs-12">
+    </div><!-- /Bottom Footer Divider -->
+
+</div><!-- /.box --></div><!-- /.row /Bottom -->
+</div><!-- /.container -->
+
+<!-- /// Hidden Data //////////////////////////////////////////// -->
+    <span id="hidden-servings-orig"
+          style="display: none;"
+          >{{ recipe.servings_orig }}</span>
+
+<!-- /// Javascript ///////////////////////////////////////////// -->
+<script src="{% static 'js/jquery.js' %}"></script>
+
+<script src="{% static 'js/js.cookie.js' %}"></script>
+
+<script type="text/javascript">
+
+    // On loading, apply any scaling of the recipe to the ingredient quantities
+    $(function() {
+        var servOrig = $('#hidden-servings-orig').text()
+        var servModifCookie = Cookies.get("servModifCookie")
+
+        if(servModifCookie) {
+            servTemp = servModifCookie
+        } else {
+            servTemp = servOrig
+        };
+
+        if(servTemp == 1) {
+            servTempStr = "1 serving: "
+        } else {
+            servTempStr = servTemp + " servings: "
+        }
+
+        $('#servings-display').text('').append(
+            servTempStr
+        );
+        $('#servings-change').text('').append(
+            "<a id='servings-scale-btn'" +
+               "class='btn btn-primary'" +
+               "href='#'" +
+               "role='button'>Change" +
+            "</a>"
+        );
+        servingsScale(servTemp);
+
+        var numIngreds = $('.qty-common').length
+        for(i = 0; i < numIngreds; i++) {
+            qtyComm = Number($('.qty-common')[i].innerText)
+            qtyDisplay = qtyComm * servTemp
+            
+            // Deal with long floats
+            length = qtyDisplay.toString().length
+            decimal = qtyDisplay.toString().indexOf('.')
+
+            if(length - decimal > 2) {
+                temp = qtyDisplay.toFixed(2);
+                lastTwo = temp.toString().slice(-2)
+                if (lastTwo == '00') {
+                    qtyDisplay = qtyDisplay.toFixed(0);
+                } else if (lastTwo == '25') {
+                    qtyDisplay = qtyDisplay.toFixed(2);
+                } else {
+                    qtyDisplay = qtyDisplay.toFixed(1);
+                };
+            };
+
+            $('.qty-common')[i].innerText = qtyDisplay
+        };
+
+        var ratingTotal = 3;
+        var starGray = "/static/img/star_gray_100px.png "
+        var starMagenta = "/static/img/star_magenta_100px.png "
+
+        
+
+        $('#stars-user').text('').append(
+            "<img id='star-1'" +
+                 "src=" + starSource1 +
+                 "width='25'>"
+        );
+
+
+
+
+    });
+
+    // Display input box to edit common name of recipe
+    $('#ingred-add-btn').on('click', function() {
+        addIngredient();
+    });
+
+    var addIngredient = function() {
+        // $('#ingred-add-btn').on('click', function() {
+            var btnID = 'ingred-common-name-add-btn'
+            var btnText = 'Add Ingredient Common Name'
+            var inputID = 'common-name-input'
+            var attribute = 'name_common'
+
+            $('#ingred-list-output-2').text('').append(  
+                "Enter the ingredient common-name: " +
+                "<input id=" + inputID + " type='text'></input> " +
+                "<a id='" + btnID + "'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>" + btnText +
+                "</a>"
+            );
+            $('#' + inputID).focus();
+            nameCommonSave(inputID, btnID, attribute);
+        // });
+    };
+
+    // Accept and save edited common name of recipe
+    var nameCommonSave = function(inputID, btnID, attribute) {
+        $('#' + btnID).on('click', function() {
+            var nameCommon = $('#' + inputID).val()
+            
+            $('#ingred-list-output-1').text('').append(
+                "____ ____ " + nameCommon
+                );
+
+            $('#ingred-list-output-2').text('').append(
+                "<h5>New Ingredient:</h5>" +
+                "Common name: " + nameCommon + "<br>"
+                );
+
+            $('#ingred-list-output-3').text('').append(
+                "You have entered the common name; now match " +
+                "the ingredient to its entry in the NDB by clicking " +
+                "one of the list items to the right/below."
+            );
+
+            $.ajax({
+                type: 'GET',
+                url: '/json_ingred_ndb_2/',
+                data: { search: nameCommon },
+                error: function() {},
+                success: function(data) {
+                    $('#right-side-head').text(
+                        'Possible Matches in NDB:'
+                        );
+                    $('#right-side-body').text('');
+                    for(i = 0; i < data.length; i++) {
+                        $('#right-side-body').append(
+                            '<li class="ndb-ingred">' +
+                            data[i][0] +
+                            ': ' +
+                            data[i][1] +
+                            '</li>'
+                        );
+                    }
+                }
+            });
+            numAndDescSave(nameCommon);
+        });
+    };
+
+    // Add selected item from NDB list to output
+    var numAndDescSave = function(nameCommon) {
+        $('#right-side-body').on('click', '.ndb-ingred', function() {
+
+            var num_and_desc = $(this).context.innerText
+            var num = num_and_desc.split(': ')[0]
+            var desc = num_and_desc.split(': ')[1]
+
+            $('#ingred-list-output-2').append(
+                "NDB Number: " + num + "<br>" +
+                "NDB Description: " + desc + "<br>"
+            );
+            $('#ingred-list-output-3').text('').append(
+                "You have matched the ingredient to the database;" +
+                " now choose its form and/or unit of measurement " +
+                "by clicking on one of the list items below/right."
+            );
+
+            $.ajax({
+                type: 'GET',
+                url: '/json_ingred_nutr/',
+                data: {search2: num },
+                error: function() {},
+                success: function(data) {
+                    $('#right-side-head').text('Forms/Measures in NDB: ');
+                    $('#right-side-body').text('');
+                    for(i=0; i < data.length; i++) {
+                        $('#right-side-body').append(
+                            '<li class="nutr-ingred">' +
+                            data[i][1] + " [" + data[i][0] + "]" +
+                            '</li>'
+                        );
+                    }
+                }
+            });
+            formOrUnitSave(nameCommon, num, desc)
+        });
+    };
+
+    // Add selected item from units/forms list to output
+    // Possible error at NDB 42267 Babyfood, juice, orange-carrot
+    var formOrUnitSave = function(nameCommon, num, desc) {
+        $('#right-side-body').on('click', '.nutr-ingred', function() {
+
+            var measures = $(this).context.innerText
+            var formOrUnit = measures.split(' [')[0]
+            var ndbQuant = measures.split(' [')[1].replace(/]/, '')
+
+            $('#ingred-list-output-1').text(
+                "____ " + formOrUnit + " " + nameCommon
+                );
+            $('#ingred-list-output-2').append(
+                "NDB Quantity: " + ndbQuant + "<br>" +
+                "Form/Unit: " + formOrUnit + "<br>"
+                );
+            $('#ingred-list-output-3').text('').append(
+                "You have chosen the form/unit; now specify " +
+                "the quantity in " + formOrUnit + "(s): <br>" +
+                "<input id='quantity-input-box' " +
+                       "style='width: 40px;'" +
+                       "type='text'></input> " +
+                "<a id='quantity-save-btn'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>Save Quantity" +
+                "</a>"
+            );
+            $('#quantity-input-box').focus();
+            quantitySave(nameCommon, num, desc, formOrUnit, ndbQuant)
+        });
+    };
+
+    // Receive quantity info and save all ingred info to database
+    var quantitySave = function(nameCommon, num, desc, formOrUnit, ndbQuant) {
+        $('#quantity-save-btn').on('click', function() {
+
+            var qtyCommon = $('#quantity-input-box').val()
+
+            $('#ingred-list-output-1').text(
+                qtyCommon + " " + formOrUnit + " " + nameCommon
+                );
+            $('#ingred-list-output-2').append(
+                "qtyCommon: " + qtyCommon + "<br>"
+            );
+            $('#ingred-list-output-3').text('').append(
+                "You have clicked the quantity save button. <br>"
+                );
+
+            $.ajax({
+                type: 'GET',
+                url: '/recipe_attr_edit_func2/' + {{ recipe.pk }},
+                data: { name_common: nameCommon,
+                        ndb_num: num,
+                        ndb_desc: desc,
+                        ndb_quant: ndbQuant,
+                        form_or_unit: formOrUnit,
+                        qty_common: qtyCommon
+                    },
+                error: function() {},
+                success: function() {
+                    location.reload(true);
+                }
+            });
+        });
+    };
+
+    // Display input box to edit name of recipe
+    $('#name-edit-btn').on('click', function() {
+        $('#name-display').text('').append(
+                "<h4>Edit the Recipe Name:</h4>" +
+                "<input id='name-append-input-box'" +
+                       "type='text'" +
+                       "value='{{ recipe.name }}'>" +
+                "</input> " +
+                "<a id='name-save-btn'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>Save Changes to Recipe Name" +
+                "</a><br>"
+            );
+        $('#name-append-input-box').focus();
+        nameSave();
+    });
+
+    // Accept and save edited name of recipe
+    var nameSave = function() {
+        $('#name-save-btn').on('click', function() {
+            $.ajax({
+                type: 'GET',
+                url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
+                data: { attr: 'name',
+                        new_value: $('#name-append-input-box').val(),
+                       },
+                error: function() {},
+                success: function() {
+                    location.reload(true);
+                }
+            });
+        });
+    };
+
+    var servingsScale = function(servTemp) {
+        $('#servings-scale-btn').on('click', function() {
+            $('#servings-display').text('').append(
+                servTemp + " &#8594;" + "&nbsp;&nbsp;" +
+                "<input id='servings-input-box'" +
+                       "type='text'" +
+                       "style='width: 35px;'" +
+                       "value='{{ recipe.servings }}'>" +
+                "</input>"
+            );
+            $('#servings-change').text('').append(
+                "<a id='servings-save-btn'" +
+                   "class='btn btn-primary'" +
+                   "href='#'" +
+                   "role='button'>Save Change" +
+                "</a>"
+            );
+            $('#servings-input-box').focus();
+            servingsSave();
+        });
+    };
+    
+    // Accept and save edited name of recipe
+    var servingsSave = function() {
+        $('#servings-save-btn').on('click', function() {
+            
+            var servModif = Number($('#servings-input-box').val())
+            Cookies.set("servModifCookie", servModif);
+
+            $.ajax({
+                type: 'GET',
+                url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
+                data: { attr: 'servings_scaled',
+                        new_value: servModif,
+                       },
+                error: function() {},
+                success: function() {
+                    location.reload(true);
+                }
+            });
+        });
+    };
+
+</script>
 
 {% endblock body %}

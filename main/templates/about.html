@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <div class="container">        
+        <div class="row">
+            <div class="box">
+
+                <div class="col-lg-12">
+                    <hr>
+                    <h1 class="page-header text-center">
+                        <strong>About Edje's Recipe Organizer</strong>
+                    </h1>
+                </div>
+
+                <div class="col-xs-8 col-xs-offset-2">
+                    <p>
+                    This website organizes recipes. It was developed as a 
+                    training exercise by Edje Jeter, with some inspiration 
+                    from www.recipe.com.
+                    </p>
+
+                    <p>
+                    Key features include:    
+                    </p>
+                    <ul>
+                        <li>Scaling ingredient quantities to user-determined 
+                            numbers of servings</li>
+                        <li>Calculating nutritional information per serving 
+                            using data from the USDA's National Nutrition 
+                            Database (NDB)</li>
+                        <li>Allowing users to rate recipes</li>
+                        <li>Allowing users to comment on recipes</li>
+                    </ul>
+                </div>
+
+            </div><!-- /.box -->
+        </div><!-- /.row -->
+
+        <div class="row">
+            <div class="box">
+                <div class="col-xs-12" style="text-align: center">
+                    <hr>
+
+                    <a id="recipe-add-btn"
+                       class="btn btn-primary"
+                       href="/recipe_create/"
+                       role="button">
+                       Add a Recipe to the Database
+                    </a>
+
+                    <a id="sign-up-btn"
+                       class="btn btn-primary"
+                       href="/sign_up/"
+                       role="button">
+                       Sign Up as a New User
+                    </a>
+
+                    {% if user.is_anonymous %}
+                        <a id="sign-in-btn"
+                           class="btn btn-primary"
+                           href="/sign_in/"
+                           role="button">
+                           Sign In
+                        </a>
+
+                    {% else %}
+                        <a id="sign-out-btn"
+                           class="btn btn-primary"
+                           href="/sign_out/"
+                           role="button">
+                           Sign out: {{ user }}
+                        </a>
+                    {% endif %}
+
+                    <br>
+                    <a href="/user_del_page/">Deactivate your account</a>
+
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

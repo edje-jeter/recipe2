@@ -20,14 +20,6 @@ from main.models import IngredNDB, IngredNutr, Recipe, Quantity
 from main.models import Comment, Vote, VoteStat
 
 
-# ---- About View ---------------------------------------------------
-def about_view(request):
-    context = {}
-
-    return render_to_response('about.html', context,
-                              context_instance=RequestContext(request))
-
-
 # ---- IngredNDB List -----------------------------------------------
 def IngredNDBListView(request):
 
@@ -235,6 +227,90 @@ def JsonIngredNutr(request):
     return JsonResponse(object_list, safe=False)
 
 
+def RecipeUpdate(request, pk):
+
+    context = {}
+    recipe = Recipe.objects.get(pk=pk)
+    context['recipe'] = recipe
+
+    nutr_basic_g = {'water': 0,
+                    'protein': 0,
+                    'lipids': 0,
+                    'carbs': 0,
+                    'fiber': 0,
+                    'sugars': 0,
+                    }
+
+    nutr_other_mg = {'sodium': 0}
+
+    energy_basic = {'energy_tot': 0,
+                    'energy_ptn': 0,
+                    'energy_fat': 0,
+                    }
+
+    # Retrieve and sum nutrition values for each nutrient in each ingredient
+    for quant in recipe.quantity_set.all():
+        # ndb_no = ingred.ingred.ndb_id.ndb_no
+        # nutr_list = NDBQuery(ndb_no)
+
+        # print quant.qty_common
+        # print quant.ingred.label
+        # print quant.name_common
+
+        qty_prop = quant.qty_prop
+        servings = quant.recipe.servings_orig
+
+        for nutr in nutr_basic_g:
+            nutr_value = getattr(quant.ingred, nutr)
+            nutr_basic_g[nutr] += nutr_value * qty_prop
+
+        for nutr in nutr_other_mg:
+            nutr_value = getattr(quant.ingred, nutr)
+            nutr_other_mg[nutr] += nutr_value * qty_prop
+
+        for energy in energy_basic:
+            energy_value = getattr(quant.ingred, energy)
+            energy_basic[energy] += energy_value * qty_prop
+
+    # Account for servings per recipe, round all values
+    # to ones' place and calculate total mass
+    mass_basic = 0
+    for nutr in nutr_basic_g:
+        mass = nutr_basic_g[nutr] / servings
+        nutr_basic_g[nutr] = int(round(mass, 0))
+        mass_basic += mass
+
+    for nutr in nutr_other_mg:
+        mass = nutr_other_mg[nutr] / servings
+        nutr_other_mg[nutr] = int(round(mass, 0))
+        mass_basic += mass / 1000
+
+    for energy in energy_basic:
+        energy_basic[energy] = int(round(energy_basic[energy] / servings, 0))
+
+    mass_basic = int(round(mass_basic, 0))
+
+    context['nutr_basic'] = nutr_basic_g
+    context['nutr_other'] = nutr_other_mg
+    context['energy_basic'] = energy_basic
+    context['mass_basic'] = mass_basic
+
+    recipe.calories_tot = energy_basic['energy_tot']
+    recipe.save()
+
+    return render_to_response('recipe_update.html', context,
+                              context_instance=RequestContext(request))
+
+
+def RecipeCreateFunc(request):
+
+    owner = str(request.user.username)
+    recipe = Recipe.objects.create(owner=owner)
+    url = reverse('recipe_update', args=([recipe.id]))
+
+    return HttpResponseRedirect(url)
+
+
 def recipe_attr_edit_func(request, pk):
 
     attr = request.GET.get('attr', '')
@@ -294,76 +370,12 @@ def RecipeListView(request):
 
 
 # ---- Recipe Detail ------------------------------------------------
-def recipe_detail(request, pk):
+def RecipeDetailView(request, pk):
 
     context = {}
+
     recipe = Recipe.objects.get(pk=pk)
-    context['recipe'] = recipe
-
-    nutr_basic_g = {'water': 0,
-                    'protein': 0,
-                    'lipids': 0,
-                    'carbs': 0,
-                    'fiber': 0,
-                    'sugars': 0,
-                    }
-
-    nutr_other_mg = {'sodium': 0}
-
-    energy_basic = {'energy_tot': 0,
-                    'energy_ptn': 0,
-                    'energy_fat': 0,
-                    }
-
-    servings = recipe.servings_orig
-    # Retrieve and sum nutrition values for each nutrient in each ingredient
-    for quant in recipe.quantity_set.all():
-        # ndb_no = ingred.ingred.ndb_id.ndb_no
-        # nutr_list = NDBQuery(ndb_no)
-
-        # print quant.qty_common
-        # print quant.ingred.label
-        # print quant.name_common
-
-        qty_prop = quant.qty_prop
-
-        for nutr in nutr_basic_g:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_basic_g[nutr] += nutr_value * qty_prop
-
-        for nutr in nutr_other_mg:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_other_mg[nutr] += nutr_value * qty_prop
-
-        for energy in energy_basic:
-            energy_value = getattr(quant.ingred, energy)
-            energy_basic[energy] += energy_value * qty_prop
-
-    # Account for servings per recipe, round all values
-    # to ones' place and calculate total mass
-    mass_basic = 0
-    for nutr in nutr_basic_g:
-        mass = nutr_basic_g[nutr] / servings
-        nutr_basic_g[nutr] = int(round(mass, 0))
-        mass_basic += mass
-
-    for nutr in nutr_other_mg:
-        mass = nutr_other_mg[nutr] / servings
-        nutr_other_mg[nutr] = int(round(mass, 0))
-        mass_basic += mass / 1000
-
-    for energy in energy_basic:
-        energy_basic[energy] = int(round(energy_basic[energy] / servings, 0))
-
-    mass_basic = int(round(mass_basic, 0))
-
-    context['nutr_basic'] = nutr_basic_g
-    context['nutr_other'] = nutr_other_mg
-    context['energy_basic'] = energy_basic
-    context['mass_basic'] = mass_basic
-
-    recipe.calories_tot = energy_basic['energy_tot']
-    recipe.save()
+    context['recipe_v'] = recipe
 
     active = request.user.is_authenticated()
     context['active'] = active
@@ -431,16 +443,23 @@ def recipe_detail(request, pk):
 
 
 # ---- Add, Edit, and Delete Recipes (models.py Recipe) -------------
-def recipe_create_func(request):
+def recipe_add(request):
 
-    owner = str(request.user.username)
-    recipe = Recipe.objects.create(
-        owner=owner,
-        name="New Recipe",
-        servings_orig=1)
-    url = reverse('recipe_detail', args=([recipe.id]))
+    context = {}
 
-    return HttpResponseRedirect(url)
+    form = RecipeAddForm()
+    context['form_recipe_add'] = form
+
+    if request.method == 'POST':
+        form = RecipeAddForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/recipe_list/')
+        else:
+            context['errors'] = form.errors
+
+    return render_to_response('recipe_add.html', context,
+                              context_instance=RequestContext(request))
 
 
 def recipe_edit(request, pk):
@@ -463,20 +482,20 @@ def recipe_edit(request, pk):
                               context_instance=RequestContext(request))
 
 
-def recipe_delete_func(request, pk):
+def recipe_del_func(request, pk):
 
     Recipe.objects.get(pk=pk).delete()
 
     return HttpResponseRedirect('/recipe_list/')
 
 
-def recipe_delete_page(request, pk):
+def recipe_del_page(request, pk):
 
     context = {}
 
     context['recipe_del'] = Recipe.objects.get(pk=pk)
 
-    return render_to_response('recipe_delete_page.html', context,
+    return render_to_response('recipe_del_page.html', context,
                               context_instance=RequestContext(request))
 
 

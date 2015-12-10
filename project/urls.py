@@ -5,28 +5,28 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^about/$', 'main.views.about_view', name='about'),
 
-    url(r'^recipe_update/(?P<pk>\d+)/$', 'main.views.RecipeUpdate', name='recipe_update'),
     url(r'^json_ingred_ndb/$', 'main.views.JsonIngredNDB', name='json_ingred_ndb'),
     url(r'^json_ingred_ndb_2/$', 'main.views.json_ingred_ndb_2', name='json_ingred_ndb_2'),
     url(r'^json_ingred_nutr/$', 'main.views.JsonIngredNutr', name='json_ingred_nutr'),
 
-    url(r'^recipe_create/$', 'main.views.RecipeCreateFunc', name='recipe_create'),
-    url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
-    url(r'^recipe_attr_edit_func2/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func2', name='recipe_attr_edit_func2'),
-
     url(r'^ingred_ndb_list/$', 'main.views.IngredNDBListView', name='ingred_ndb_list'),
     url(r'^ingred_ndb_detail/(?P<pk>\d+)/$', 'main.views.IngredNDBDetailView', name='ingred_ndb_detail'),
+
     url(r'^ingred_add/$', 'main.views.ingred_add', name='ingred_add'),
     url(r'^ingred_del_func/(?P<pk>\d+)/$', 'main.views.ingred_del_func', name='ingred_del_func'),
     url(r'^ingred_del_page/(?P<pk>\d+)/$', 'main.views.ingred_del_page', name='ingred_del_page'),
 
     url(r'^recipe_list/$', 'main.views.RecipeListView', name='recipe_list'),
-    url(r'^recipe_detail/(?P<pk>\d+)/$', 'main.views.RecipeDetailView', name='recipe_detail'),
-    url(r'^recipe_add/$', 'main.views.recipe_add', name='recipe_add'),
+    url(r'^recipe_detail/(?P<pk>\d+)/$', 'main.views.recipe_detail', name='recipe_detail'),
+    url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
+    url(r'^recipe_attr_edit_func2/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func2', name='recipe_attr_edit_func2'),
+
+    url(r'^recipe_create/$', 'main.views.recipe_create_func', name='recipe_create'),
     url(r'^recipe_edit/(?P<pk>\d+)/$', 'main.views.recipe_edit', name='recipe_edit'),
-    url(r'^recipe_del_func/(?P<pk>\d+)/$', 'main.views.recipe_del_func', name='recipe_del_func'),
-    url(r'^recipe_del_page/(?P<pk>\d+)/$', 'main.views.recipe_del_page', name='recipe_del_page'),
+    url(r'^recipe_delete_func/(?P<pk>\d+)/$', 'main.views.recipe_delete_func', name='recipe_delete_func'),
+    url(r'^recipe_delete_page/(?P<pk>\d+)/$', 'main.views.recipe_delete_page', name='recipe_delete_page'),
 
     url(r'^sign_up/$', 'main.views.sign_up', name='sign_up'),
     url(r'^sign_in/$', 'main.views.sign_in', name='sign_in_v'),

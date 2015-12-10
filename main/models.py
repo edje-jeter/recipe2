@@ -58,9 +58,14 @@ class Recipe(models.Model):
     servings_scaled = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
 
     calories_tot = models.IntegerField(default=0, null=False, blank=True)
-    time_prep = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
-    time_cook = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
-    time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
+
+    time_prep = models.IntegerField(default=60, null=False, blank=True)
+    time_cook = models.IntegerField(default=60, null=False, blank=True)
+    time_tot = models.IntegerField(default=60, null=False, blank=True)
+
+    # time_prep = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
+    # time_cook = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
+    # time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
 
     directions = models.TextField(null=False, blank=True)
     author = models.CharField(max_length=255, null=True, blank=True)

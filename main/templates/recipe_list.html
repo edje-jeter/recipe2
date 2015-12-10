@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 {% block body %}
 
     <div class="container">        
@@ -13,7 +14,6 @@
 
                 <div>
                     {% for recipe in recipes %}
-                        Recipe name: 
                         <a href="/recipe_detail/{{ recipe.pk }}">
                             {{ recipe.name }}
                         </a>
@@ -39,7 +39,7 @@
                     {% endif %}
 
                     <br>
-                    <a href="/user_del_page/">Delete your account</a>
+                    <a href="/user_del_page/">Deactivate your account</a>
 
                     <hr>
                 </div>

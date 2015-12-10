@@ -5,6 +5,52 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
+body {
+    padding-top: 45px;
+}
+
+h1 {
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+
+.nutrition-info {
+    border-collapse: separate;
+    border-spacing: 5px 0px;
+}
+
+.meta-info-spacer {
+    margin-top: 0px;
+}
+
+.meta-info-head {
+    font-size: 100%;
+    font-weight: 700;
+    color: Gray;
+}
+
+.blank-row
+{
+    height: 10px !important; /* Overwrite any previous rules */
+    background-color: #FFFFFF;
+}
+
+.key-info-head {
+    font-size: 110%;
+    font-weight: 700;
+    color: Gray;
+}
+
+.key-info-data {
+    font-size: 130%;
+    font-weight: 900;
+    color: Black;
+}
+
+.ingredient-list {
+    line-height: 1.9;
+}
+
  /*! Change .thumb from thumbnail-gallery.css: margin-bottom was 30px */
 .thumb {
     margin-bottom: 40px;
@@ -27,15 +73,4 @@ p {
 #search_form {
     margin: 12px;
 
-}
-
-#nutrition-info {
-    border-collapse: separate;
-    border-spacing: 7px 0px;
-}
-
-.blank-row
-{
-    height: 10px !important; /* Overwrite any previous rules */
-    background-color: #FFFFFF;
 }
