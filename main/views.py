@@ -17,7 +17,7 @@ from main.forms import UserSignUp, UserSignIn
 from main.forms import CommentForm
 
 from main.models import IngredNDB, IngredNutr, Recipe, Quantity
-from main.models import Comment, Vote, VoteStat
+from main.models import Comment, Vote, VoteStat, Rating, RatingStat
 
 
 # ---- About View ---------------------------------------------------
@@ -318,12 +318,6 @@ def recipe_detail(request, pk):
     servings = recipe.servings_orig
     # Retrieve and sum nutrition values for each nutrient in each ingredient
     for quant in recipe.quantity_set.all():
-        # ndb_no = ingred.ingred.ndb_id.ndb_no
-        # nutr_list = NDBQuery(ndb_no)
-
-        # print quant.qty_common
-        # print quant.ingred.label
-        # print quant.name_common
 
         qty_prop = quant.qty_prop
 
@@ -367,6 +361,25 @@ def recipe_detail(request, pk):
 
     active = request.user.is_authenticated()
     context['active'] = active
+
+    # Get rating (set to replace voting) ----------------------------
+    if active:
+        h_temp = "_".join([str(pk), str(request.user.username)])
+        rating, created = Rating.objects.get_or_create(recipe=recipe,
+                                                       handle=h_temp)
+
+        if created:
+            return HttpResponseRedirect('/rating_stats_func/%s' % pk)
+
+        context['rating_v'] = rating
+
+    else:
+        context['rating_v'] = -1
+
+    # Get Rating stats ---------------------------------------------
+    rating_stat, created = RatingStat.objects.get_or_create(recipe=recipe)
+
+    context['rating_stat_v'] = rating_stat
 
     # Get vote_state ------------------------------------------------
     if active:
@@ -437,7 +450,8 @@ def recipe_create_func(request):
     recipe = Recipe.objects.create(
         owner=owner,
         name="New Recipe",
-        servings_orig=1)
+        servings_orig=1,
+        image="/static/img/food_default_300px.jpg")
     url = reverse('recipe_detail', args=([recipe.id]))
 
     return HttpResponseRedirect(url)
@@ -699,4 +713,87 @@ def vote_stats_func(request, pk):
 
     vote_stat.save()
 
+    return HttpResponseRedirect('/recipe_detail/%s' % pk)
+
+
+def rating_func(request, pk):
+
+    rating_new = request.GET.get('rating_new', '')
+
+    h_temp = "_".join([str(pk), str(request.user)])
+    rating_cur = Rating.objects.get(handle=h_temp)
+
+    rating_cur.rating = rating_new
+
+    rating_cur.save()
+
+    # return HttpResponse(status=200)
+    return HttpResponseRedirect('/rating_stats_func/%s' % pk)
+
+
+def rating_stats_func(request, pk):
+
+    # Count (zero and non-zero) ratings for the given Recipe --------
+    r0_obj = Rating.objects.filter(recipe=pk)
+    r0_len = len(r0_obj)
+
+    r_obj = r0_obj.exclude(rating=0)
+    r_count = len(r_obj)
+    r0_count = r0_len - r_count
+
+    print "r0_count: %s" % r0_count
+    print "r_count: %s" % r_count
+
+    # Sum ratings for the given Recipe ------------------------------
+    # And collect data for distribution / histogram
+    i = 0
+    r_sum = 0
+    r_distrib = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    print "r_distrib (before): %s" % r_distrib
+
+    for r in r_obj:
+        # print "%s: %s" % (r, r.rating)
+        r_sum += r.rating
+        # print "r_sum: %s" % r_sum
+        # print "rd_before: %s" % r_distrib[int(r.rating)]
+        r_distrib[int(r.rating)] += 1
+        # print "rd_after: %s" % r_distrib[int(r.rating)]
+    print "r_distrib (after): %s" % r_distrib
+
+    # Find the average rating for the given Recipe ------------------
+    if r_count == 0:
+        r_avg = 0
+    else:
+        r_avg = float(r_sum) / float(r_count)
+    print "r_avg: %s / %s = %s" % (r_sum, r_count, r_avg)
+
+    # Calculate histogram % for each star-rating --------------------
+    r_percent = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    if r_count > 0:
+        for r in r_percent:
+            r_percent[r] = r_distrib[r] * 100 / r_count
+    else:
+        pass
+    print "r_percent: %s" % r_percent
+
+    # Save stats to RatingStat model --------------------------------
+    rating_stat, created = RatingStat.objects.get_or_create(recipe_id=pk)
+
+    rating_stat.count = r_count
+    rating_stat.avg = r_avg
+
+    # Populate distrib and % fields: (r0_d, r1_d, r2_d, ...; r1_p, r2_p, ...)
+    rating_stat.r0_d = r0_count
+    for r in r_distrib:
+        attr_distrib = "r%s_d" % r
+        val_distrib = r_distrib[r]
+        setattr(rating_stat, attr_distrib, val_distrib)
+
+        attr_percent = "r%s_p" % r
+        val_percent = r_percent[r]
+        setattr(rating_stat, attr_percent, val_percent)
+
+    rating_stat.save()
+
+    # return HttpResponse(status=200)
     return HttpResponseRedirect('/recipe_detail/%s' % pk)

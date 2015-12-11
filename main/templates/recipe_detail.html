@@ -16,7 +16,6 @@
             <h1>{{ recipe.name }}</h1>
         </div>
 
-    {% comment %}
         <div id="name-btn"
              style="text-align: right"
              class="col-lg-2
@@ -27,7 +26,6 @@
                role="button">Edit Name
             </a>
         </div>
-    {% endcomment %}
  
     </div><!-- /#name-section -->
 
@@ -43,10 +41,17 @@
                 col-sm-4
                 col-xs-12">
 
-        <img id="image-display"
-             class="col-md-12"
-             src="{{ recipe.image.url }}"
-             alt="testing">
+        {% if recipe.image %}
+            <img id="image-display"
+                 class="col-md-12"
+                 src="{{ recipe.image.url }}"
+                 alt="testing">
+        {% else %}
+            <img id="image-display"
+                 class="col-md-12"
+                 src="{% static 'img/food_default_300px.jpg' %}"
+                 alt="testing">
+        {% endif %}
 
     </div><!-- /#header-left-side -->
 
@@ -113,31 +118,55 @@
         </div><!-- /#nutr-voting-divider -->
 
     <!-- Voting ................................................. -->
-        <div id="voting" class="col-xs-12">
+        <div id="voting" class="col-sm-8 col-xs-12">
 
-            <div id="stars-user">
+            <div id="stars-tot" class="col-xs-6">
+                <span id="stars-total"></span>
+                <br>
+                <span id="raters-total">{{ rating_stat_v.count }}</span> ratings; avg: 
+                <span id="rating-total">{{ rating_stat_v.avg }}</span>
             </div>
 
-        <br><br>
+            <div id="stars-use" class="col-xs-6">
+                <span id="stars-user"></span>
+                <br>
 
-            {% if active %}
-                {# vote state = {{ vote_v.state }}<br> #}
-                <a href="/vote_up_func/{{ recipe.pk }}">
-                    Vote Up
-                </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
-                
-                <a href="/vote_dn_func/{{ recipe.pk }}">
-                    Vote Down
-                </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
+                <span id="hidden-rating-saved"
+                      style="display: none;"
+                >{{ rating_v.rating }}</span>
 
-            {% else %}
-                You must be signed-in to vote <br>
-                ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
-                ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
+                {% if rating_v.rating == -1 %}
+                    Sign-in to rate
+                {% elif rating_v.rating == 0 %}
+                    Add your rating
+                {% else %}
+                    <a id="rating-remove" href="#">Remove your rating</a>
+                {% endif %}
 
-            {% endif %}
+            </div>
+
+        <br><br><br>
+
+            <div class="col-xs-12">
+                {% if active %}
+                    {# vote state = {{ vote_v.state }}<br> #}
+                    <a href="/vote_up_func/{{ recipe.pk }}">
+                        Vote Up
+                    </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
+                    
+                    <a href="/vote_dn_func/{{ recipe.pk }}">
+                        Vote Down
+                    </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
+
+                {% else %}
+                    You must be signed-in to vote <br>
+                    ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
+                    ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
+
+                {% endif %}
             
             <br><br>
+            </div>
 
         </div><!-- /#voting -->
 
@@ -359,8 +388,13 @@
 
 <script type="text/javascript">
 
+    // Set the source of the rating-star images
+    var starGray = "/static/img/star_gray_100px.png ";
+    var starMagenta = "/static/img/star_magenta_100px.png ";
+
     // On loading, apply any scaling of the recipe to the ingredient quantities
     $(function() {
+
         var servOrig = $('#hidden-servings-orig').text()
         var servModifCookie = Cookies.get("servModifCookie")
 
@@ -412,22 +446,121 @@
             $('.qty-common')[i].innerText = qtyDisplay
         };
 
-        var ratingTotal = 3;
-        var starGray = "/static/img/star_gray_100px.png "
-        var starMagenta = "/static/img/star_magenta_100px.png "
+        // Rating of Recipes
+        var ratersTotal = $('#raters-total').text();
+        var ratingTotal = $('#rating-total').text();
+        var ratingSaved = $('#hidden-rating-saved').text();
 
-        
+        var starSourceC = [starGray, starGray, starGray, starGray, starGray];
+        var starSourceU = [starGray, starGray, starGray, starGray, starGray];
 
-        $('#stars-user').text('').append(
-            "<img id='star-1'" +
-                 "src=" + starSource1 +
-                 "width='25'>"
+        for (i = 0; i < Math.floor(ratingTotal); i++) {
+            starSourceC[i] = starMagenta;
+        };
+
+        $('#stars-total').text('').append(
+            "<img class='star-crowd'" +
+                 "id='star-c-1'" +
+                 "src=" + starSourceC[0] + ">" +
+            "<img class='star-crowd'" +
+                 "id='star-c-2'" +
+                 "src=" + starSourceC[1] + ">" +
+            "<img class='star-crowd'" +
+                 "id='star-c-3'" +
+                 "src=" + starSourceC[2] + ">" +
+            "<img class='star-crowd'" +
+                 "id='star-c-4'" +
+                 "src=" + starSourceC[3] + ">" +
+            "<img class='star-crowd'" +
+                 "id='star-c-5'" +
+                 "src=" + starSourceC[4] + ">"
         );
 
+        for (i = 0; i < ratingSaved; i++) {
+            starSourceU[i] = starMagenta;
+        };
 
-
-
+        $('#stars-user').text('').append(
+            "<img class='star-user' id='star-u-1'" +
+                 "src=" + starSourceU[0] + ">" +
+            "<img class='star-user' id='star-u-2'" +
+                 "src=" + starSourceU[1] + ">" +
+            "<img class='star-user' id='star-u-3'" +
+                 "src=" + starSourceU[2] + ">" +
+            "<img class='star-user' id='star-u-4'" +
+                 "src=" + starSourceU[3] + ">" +
+            "<img class='star-user' id='star-u-5'" +
+                 "src=" + starSourceU[4] + ">"
+        );
+        ratingMouseOver(ratingSaved);
     });
+
+    // Set up user rating by changing star colors as the mouse touches
+    var ratingMouseOver = function(ratingSaved) {
+        $('.star-user').on('mouseleave', function() {
+            for (i = 1; i <= 5; i++) {
+                if (i <= ratingSaved) {
+                    $('#star-u-' + i).attr('src', starMagenta);
+                } else {
+                    $('#star-u-' + i).attr('src', starGray);
+                };
+            };
+        });
+
+        $('.star-user').on('mouseover', function() {
+            var starNum = Number(this.id.slice(-1))
+            // console.log(starNum);
+            ratingTemp(starNum);
+        });
+
+        // Capture actual user rating when user clicks on a star
+        $('.star-user').on('click', function() {
+            var starNum = Number(this.id.slice(-1))
+            console.log(starNum);
+            ratingPerm(starNum);
+        });
+
+        // Remove user rating when user clicks on "remove your rating"
+        $('#rating-remove').on('click', function() {
+            var starNum = 0;
+            console.log(starNum);
+            ratingPerm(starNum);
+        });
+    };
+
+    var ratingTemp = function(starNum) {
+        for (i = 1; i <= 5; i++) {
+            if (i <= starNum) {
+                $('#star-u-' + i).attr('src', starMagenta);
+            } else {
+                $('#star-u-' + i).attr('src', starGray);
+            };
+        };
+    };
+
+    var ratingPerm = function(starNum) {
+
+        $.ajax({
+            type: 'GET',
+            url: '/rating_func/' + {{ recipe.pk }},
+            data: { rating_new: starNum },
+            error: function() {},
+            success: function() {
+                console.log("rating_func success")
+                location.reload(true);
+            }
+        });
+
+        // $.ajax({
+        //     type: 'GET',
+        //     url: '/rating_stats_func/' + {{ recipe.pk }},
+        //     data: { },
+        //     error: function() {},
+        //     success: function() {
+        //         location.reload(true);
+        //     }
+        // });
+    };
 
     // Display input box to edit common name of recipe
     $('#ingred-add-btn').on('click', function() {

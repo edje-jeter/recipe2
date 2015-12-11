@@ -37,6 +37,9 @@ urlpatterns = [
     url(r'^vote_dn_func/(?P<pk>\d+)/$', 'main.views.vote_dn_func', name='vote_dn_func'),
     url(r'^vote_stats_func/(?P<pk>\d+)/$', 'main.views.vote_stats_func', name='vote_stats_func'),
 
+    url(r'^rating_func/(?P<pk>\d+)/$', 'main.views.rating_func', name='rating_func'),
+    url(r'^rating_stats_func/(?P<pk>\d+)/$', 'main.views.rating_stats_func', name='rating_stats_func'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 """project URL Configuration

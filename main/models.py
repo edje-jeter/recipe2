@@ -52,7 +52,7 @@ class Recipe(models.Model):
 
     name = models.CharField(max_length=255, null=False, blank=True)
     description = models.TextField(null=False, blank=True)
-    category = models.CharField(max_length=255)
+    category = models.CharField(max_length=255, null=False, blank=True)
     tags = models.TextField(null=False, blank=True)
     servings_orig = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
     servings_scaled = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
@@ -128,6 +128,42 @@ class VoteStat(models.Model):
 
     v_up_p = models.DecimalField(default=0, max_digits=4, decimal_places=1, null=False, blank=True)
     v_dn_p = models.DecimalField(default=0, max_digits=4, decimal_places=1, null=False, blank=True)
+
+    def __unicode__(self):
+        return unicode(self.id)
+
+
+# ---- Rating Model -------------------------------------------------
+class Rating(models.Model):
+    handle = models.CharField(max_length=200, null=False, blank=False)
+    recipe = models.ForeignKey(Recipe)
+    user = models.ManyToManyField(User)
+    rating = models.IntegerField(default=0, null=False, blank=True)
+
+    def __unicode__(self):
+        return self.handle
+
+
+# ---- RatingStat Model ----------------------------------------------
+class RatingStat(models.Model):
+    recipe = models.OneToOneField(Recipe)
+
+    count = models.IntegerField(default=0, null=False, blank=True)
+    avg = models.DecimalField(default=0, max_digits=3, decimal_places=2, null=False, blank=True)
+
+    r0_d = models.IntegerField(default=0, null=False, blank=True)
+    r1_d = models.IntegerField(default=0, null=False, blank=True)
+    r2_d = models.IntegerField(default=0, null=False, blank=True)
+    r3_d = models.IntegerField(default=0, null=False, blank=True)
+    r4_d = models.IntegerField(default=0, null=False, blank=True)
+    r5_d = models.IntegerField(default=0, null=False, blank=True)
+
+    r0_p = models.IntegerField(default=0, null=False, blank=True)
+    r1_p = models.IntegerField(default=0, null=False, blank=True)
+    r2_p = models.IntegerField(default=0, null=False, blank=True)
+    r3_p = models.IntegerField(default=0, null=False, blank=True)
+    r4_p = models.IntegerField(default=0, null=False, blank=True)
+    r5_p = models.IntegerField(default=0, null=False, blank=True)
 
     def __unicode__(self):
         return unicode(self.id)

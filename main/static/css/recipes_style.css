@@ -14,6 +14,10 @@ h1 {
     margin-bottom: 5px;
 }
 
+.star-crowd, .star-user {
+    width: 25px;
+}
+
 .nutrition-info {
     border-collapse: separate;
     border-spacing: 5px 0px;
