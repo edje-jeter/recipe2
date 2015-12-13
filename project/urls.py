@@ -7,8 +7,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^about/$', 'main.views.about_view', name='about'),
 
-    url(r'^json_ingred_ndb/$', 'main.views.JsonIngredNDB', name='json_ingred_ndb'),
-    url(r'^json_ingred_ndb_2/$', 'main.views.json_ingred_ndb_2', name='json_ingred_ndb_2'),
+    url(r'^get_ingred_ndb_json/$', 'main.views.get_ingred_ndb_json', name='get_ingred_ndb_json'),
     url(r'^json_ingred_nutr/$', 'main.views.JsonIngredNutr', name='json_ingred_nutr'),
 
     url(r'^ingred_ndb_list/$', 'main.views.IngredNDBListView', name='ingred_ndb_list'),
@@ -21,21 +20,18 @@ urlpatterns = [
     url(r'^recipe_list/$', 'main.views.RecipeListView', name='recipe_list'),
     url(r'^recipe_detail/(?P<pk>\d+)/$', 'main.views.recipe_detail', name='recipe_detail'),
     url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
-    url(r'^recipe_attr_edit_func2/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func2', name='recipe_attr_edit_func2'),
+    url(r'^add_quantity/(?P<pk>\d+)/$', 'main.views.add_quantity', name='add_quantity'),
 
     url(r'^recipe_create/$', 'main.views.recipe_create_func', name='recipe_create'),
     url(r'^recipe_edit/(?P<pk>\d+)/$', 'main.views.recipe_edit', name='recipe_edit'),
     url(r'^recipe_delete_func/(?P<pk>\d+)/$', 'main.views.recipe_delete_func', name='recipe_delete_func'),
     url(r'^recipe_delete_page/(?P<pk>\d+)/$', 'main.views.recipe_delete_page', name='recipe_delete_page'),
+    url(r'^activate_edit_flag/(?P<pk>\d+)/$', 'main.views.activate_edit_flag', name='activate_edit_flag'),
 
     url(r'^sign_up/$', 'main.views.sign_up', name='sign_up'),
     url(r'^sign_in/$', 'main.views.sign_in', name='sign_in_v'),
     url(r'^sign_out/$', 'main.views.sign_out', name='sign_out_v'),
     url(r'^user_del_page/$', 'main.views.user_del_page', name='user_del_page'),
-
-    url(r'^vote_up_func/(?P<pk>\d+)/$', 'main.views.vote_up_func', name='vote_up_func'),
-    url(r'^vote_dn_func/(?P<pk>\d+)/$', 'main.views.vote_dn_func', name='vote_dn_func'),
-    url(r'^vote_stats_func/(?P<pk>\d+)/$', 'main.views.vote_stats_func', name='vote_stats_func'),
 
     url(r'^rating_func/(?P<pk>\d+)/$', 'main.views.rating_func', name='rating_func'),
     url(r'^rating_stats_func/(?P<pk>\d+)/$', 'main.views.rating_stats_func', name='rating_stats_func'),

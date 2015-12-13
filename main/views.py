@@ -180,22 +180,8 @@ def IngredNDBDetailView(request, pk):
 
 
 #  ---- Adding Ingredients to a Recipe ------------------------------
-def JsonIngredNDB(request):
-    search_string = request.GET.get('search', '')
-
-    objects = IngredNDB.objects.filter(
-        ndb_description__icontains=search_string
-        )
-
-    object_list = []
-    for obj in objects:
-        object_list.append([obj.ndb_no, obj.ndb_description])
-
-    return JsonResponse(object_list, safe=False)
-
-
 # Currently does not remove duplicates from output
-def json_ingred_ndb_2(request):
+def get_ingred_ndb_json(request):
     search_text = request.GET.get('search', '')
     object_list = []
 
@@ -248,7 +234,7 @@ def recipe_attr_edit_func(request, pk):
     return HttpResponse(status=200)
 
 
-def recipe_attr_edit_func2(request, pk):
+def add_quantity(request, pk):
 
     name_common = request.GET.get('name_common', '')
     ndb_num = request.GET.get('ndb_num', '')
@@ -293,13 +279,8 @@ def RecipeListView(request):
                               context_instance=RequestContext(request))
 
 
-# ---- Recipe Detail ------------------------------------------------
-def recipe_detail(request, pk):
-
-    context = {}
-    recipe = Recipe.objects.get(pk=pk)
-    context['recipe'] = recipe
-
+# ---- Tabulate Basic Nutrition Info for Recipe ---------------------
+def tabulate_basic_nutr(recipe):
     nutr_basic_g = {'water': 0,
                     'protein': 0,
                     'lipids': 0,
@@ -333,8 +314,11 @@ def recipe_detail(request, pk):
             energy_value = getattr(quant.ingred, energy)
             energy_basic[energy] += energy_value * qty_prop
 
-    # Account for servings per recipe, round all values
-    # to ones' place and calculate total mass
+    return [nutr_basic_g, nutr_other_mg, energy_basic, servings]
+
+
+# ---- Scale Nutrition Info per serving; deal with decimals ---------
+def scale_basic_nutr(nutr_basic_g, nutr_other_mg, energy_basic, servings):
     mass_basic = 0
     for nutr in nutr_basic_g:
         mass = nutr_basic_g[nutr] / servings
@@ -351,92 +335,106 @@ def recipe_detail(request, pk):
 
     mass_basic = int(round(mass_basic, 0))
 
-    context['nutr_basic'] = nutr_basic_g
-    context['nutr_other'] = nutr_other_mg
-    context['energy_basic'] = energy_basic
-    context['mass_basic'] = mass_basic
+    return [nutr_basic_g, nutr_other_mg, energy_basic, mass_basic]
 
-    recipe.calories_tot = energy_basic['energy_tot']
-    recipe.save()
 
-    active = request.user.is_authenticated()
-    context['active'] = active
-
-    # Get rating (set to replace voting) ----------------------------
+# ---- Get Rating and Rating Stats ----------------------------------
+def get_ratings(active, request, pk, recipe):
     if active:
         h_temp = "_".join([str(pk), str(request.user.username)])
         rating, created = Rating.objects.get_or_create(recipe=recipe,
                                                        handle=h_temp)
-
         if created:
             return HttpResponseRedirect('/rating_stats_func/%s' % pk)
-
-        context['rating_v'] = rating
-
+        rating_v = rating
     else:
-        context['rating_v'] = -1
+        rating_v = -1
 
-    # Get Rating stats ---------------------------------------------
+    return rating_v
+
+
+# ---- Get Rating stats ---------------------------------------------
+def get_rating_stats(recipe):
     rating_stat, created = RatingStat.objects.get_or_create(recipe=recipe)
 
-    context['rating_stat_v'] = rating_stat
+    return rating_stat
 
-    # Get vote_state ------------------------------------------------
-    if active:
-        h_temp = "_".join([str(pk), str(request.user.username)])
-        vote, created = Vote.objects.get_or_create(recipe=recipe,
-                                                   handle=h_temp)
 
-        if created:
-            return HttpResponseRedirect('/vote_stats_func/%s' % pk)
+# ---- Get Old Comments ---------------------------------------------
+def get_old_comments(recipe):
 
-        context['vote_v'] = vote
+    return Comment.objects.filter(recipe=recipe)
 
+
+# ---- Get New Comments ---------------------------------------------
+def get_new_comments(from_form, request, old_comments, pk):
+    new_comment = from_form.save()
+
+    user_name = request.user.username
+    time = str(new_comment.time_stamp)
+
+    # Number comments so deletions by moderator don't change other #s
+    length = len(old_comments)
+    print "length: %s" % length
+    if length == 1:
+        number = length
     else:
-        context['vote_v'] = 2
+        number = old_comments[length - 2].number + 1
+        print "number: %s" % number
 
-    # Get vote stats ------------------------------------------------
-    vote_stat, created = VoteStat.objects.get_or_create(recipe=recipe)
+    new_comment.user_name = user_name
+    new_comment.handle = "_".join([str(pk), user_name, time])
+    new_comment.number = number
+    new_comment.email = request.user.email
+    new_comment.save()
 
-    context['vote_stat_v'] = vote_stat
+    return "Success"
 
-    # Retrieve old comments -----------------------------------------
-    old_comments = Comment.objects.filter(recipe=recipe)
-    context['old_comments_v'] = old_comments
 
-    # Show empty form for new comments, process new comments --------
+# ---- Recipe Detail ------------------------------------------------
+def recipe_detail(request, pk):
+
+    context = {}
+    recipe = Recipe.objects.get(pk=pk)
+
+    # Tabulate basic nutrition info
+    tab = tabulate_basic_nutr(recipe)
+
+    # Account for servings per recipe; round numbers; calc total mass
+    sca = scale_basic_nutr(tab[0], tab[1], tab[2], tab[3])
+
+    # Save the total number of calories per serving to the database
+    recipe.calories_tot = sca[2]['energy_tot']
+    recipe.save()
+
+    # Authenticate the user
+    active = request.user.is_authenticated()
+
+    # # Handle Comments
+    old_comments = get_old_comments(recipe)
     if active:
-        context['comments_v'] = CommentForm(initial={'recipe': pk})
+        cntxt_comments_v = CommentForm(initial={'recipe': pk})
         if request.method == 'POST':
             from_form = CommentForm(request.POST)
-
             if from_form.is_valid():
-                new_comment = from_form.save()
-
-                user_name = request.user.username
-                time = str(new_comment.time_stamp)
-
-                # Because comments might get moderated, a given comment-number
-                # might not match the total number of allowed comments
-                # preceding it (ie, if there are 10 comments, the next comment
-                # will be #11 [ie, 10 + 1] but if #2 is deleted by the admin,
-                # the subsequent comment should be #12 even though there are
-                # only 11 comments in the list.
-                length = len(old_comments)
-                if length == 1:
-                    number = length
-                else:
-                    number = old_comments[length - 2].number + 1
-
-                new_comment.user_name = user_name
-                new_comment.handle = "_".join([str(pk), user_name, time])
-                new_comment.number = number
-                new_comment.email = request.user.email
-                new_comment.save()
-
+                get_new_comments(from_form, request, old_comments, pk)
                 return HttpResponseRedirect('/recipe_detail/%s/' % pk)
-            else:
-                context['errors'] = new_comment.errors
+
+    # Context Variables
+    context['recipe'] = recipe
+
+    context['nutr_basic'] = sca[0]
+    context['nutr_other'] = sca[1]
+    context['energy_basic'] = sca[2]
+    context['mass_basic'] = sca[3]
+
+    context['active'] = active
+
+    context['rating_v'] = get_ratings(active, request, pk, recipe)
+    context['rating_stat_v'] = get_rating_stats(recipe)
+
+    context['old_comments_v'] = old_comments
+    context['comments_v'] = cntxt_comments_v
 
     # Send data to template -----------------------------------------
     return render_to_response('recipe_detail.html', context,
@@ -475,6 +473,14 @@ def recipe_edit(request, pk):
 
     return render_to_response('recipe_edit.html', context,
                               context_instance=RequestContext(request))
+
+
+def activate_edit_flag(request, pk):
+    recipe = Recipe.objects.get(pk=pk)
+    recipe.edit_flag = True
+    recipe.save()
+
+    return HttpResponse(status=200)
 
 
 def recipe_delete_func(request, pk):
@@ -653,69 +659,7 @@ def user_del_page(request):
                               context_instance=RequestContext(request))
 
 
-# ---- Voting Recipes Up or Down ------------------------------------
-# If user has never voted, upvote makes their vote = +1;
-# If they have voted before & their vote == +1, upvote makes vote = 0;
-# ... if their vote was 0 or -1, upvote makes their vote = +1
-# Likewise for downvotes (with appropriate changes in sign)
-def vote_up_func(request, pk):
-
-    h_temp = "_".join([str(pk), str(request.user)])
-    vote_cur = Vote.objects.get(handle=h_temp)
-
-    if vote_cur.state == 1:
-        vote_cur.state = 0
-
-    else:
-        vote_cur.state = 1
-
-    vote_cur.save()
-
-    return HttpResponseRedirect('/vote_stats_func/%s' % pk)
-
-
-def vote_dn_func(request, pk):
-
-    h_temp = "_".join([str(pk), str(request.user)])
-    vote_cur = Vote.objects.get(handle=h_temp)
-
-    if vote_cur.state == -1:
-        vote_cur.state = 0
-
-    else:
-        vote_cur.state = -1
-
-    vote_cur.save()
-
-    return HttpResponseRedirect('/vote_stats_func/%s' % pk)
-
-
-def vote_stats_func(request, pk):
-
-    # Count votes for the given Recipe ------------------------------
-    upvote_sum = len(Vote.objects.filter(recipe=pk, state=1))
-    dnvote_sum = len(Vote.objects.filter(recipe=pk, state=-1))
-    totvote_sum = upvote_sum + dnvote_sum
-
-    # Save stats to VoteStat model ----------------------------------
-    vote_stat, created = VoteStat.objects.get_or_create(recipe_id=pk)
-
-    vote_stat.v_up = upvote_sum
-    vote_stat.v_dn = dnvote_sum
-    vote_stat.v_tot = totvote_sum
-
-    if totvote_sum == 0:
-        vote_stat.v_up_p = 0.0
-        vote_stat.v_dn_p = 0.0
-    else:
-        vote_stat.v_up_p = upvote_sum * 100 / totvote_sum
-        vote_stat.v_dn_p = dnvote_sum * 100 / totvote_sum
-
-    vote_stat.save()
-
-    return HttpResponseRedirect('/recipe_detail/%s' % pk)
-
-
+# ---- Rating Recipes -----------------------------------------------
 def rating_func(request, pk):
 
     rating_new = request.GET.get('rating_new', '')
@@ -741,31 +685,18 @@ def rating_stats_func(request, pk):
     r_count = len(r_obj)
     r0_count = r0_len - r_count
 
-    print "r0_count: %s" % r0_count
-    print "r_count: %s" % r_count
-
-    # Sum ratings for the given Recipe ------------------------------
-    # And collect data for distribution / histogram
-    i = 0
+    # Sum ratings and collect data for distribution / histogram -----
     r_sum = 0
     r_distrib = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-    print "r_distrib (before): %s" % r_distrib
-
     for r in r_obj:
-        # print "%s: %s" % (r, r.rating)
         r_sum += r.rating
-        # print "r_sum: %s" % r_sum
-        # print "rd_before: %s" % r_distrib[int(r.rating)]
         r_distrib[int(r.rating)] += 1
-        # print "rd_after: %s" % r_distrib[int(r.rating)]
-    print "r_distrib (after): %s" % r_distrib
 
     # Find the average rating for the given Recipe ------------------
     if r_count == 0:
         r_avg = 0
     else:
         r_avg = float(r_sum) / float(r_count)
-    print "r_avg: %s / %s = %s" % (r_sum, r_count, r_avg)
 
     # Calculate histogram % for each star-rating --------------------
     r_percent = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
@@ -774,7 +705,6 @@ def rating_stats_func(request, pk):
             r_percent[r] = r_distrib[r] * 100 / r_count
     else:
         pass
-    print "r_percent: %s" % r_percent
 
     # Save stats to RatingStat model --------------------------------
     rating_stat, created = RatingStat.objects.get_or_create(recipe_id=pk)
@@ -782,7 +712,7 @@ def rating_stats_func(request, pk):
     rating_stat.count = r_count
     rating_stat.avg = r_avg
 
-    # Populate distrib and % fields: (r0_d, r1_d, r2_d, ...; r1_p, r2_p, ...)
+    # Populate distrib and % fields: (r0_d; r1_d, r2_d, ...; r1_p, r2_p, ...)
     rating_stat.r0_d = r0_count
     for r in r_distrib:
         attr_distrib = "r%s_d" % r
@@ -795,5 +725,4 @@ def rating_stats_func(request, pk):
 
     rating_stat.save()
 
-    # return HttpResponse(status=200)
     return HttpResponseRedirect('/recipe_detail/%s' % pk)

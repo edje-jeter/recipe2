@@ -51,7 +51,7 @@ class Recipe(models.Model):
     ingred = models.ManyToManyField(IngredNutr, through='main.Quantity')
 
     name = models.CharField(max_length=255, null=False, blank=True)
-    description = models.TextField(null=False, blank=True)
+    description = models.CharField(max_length=100, null=False, blank=True)
     category = models.CharField(max_length=255, null=False, blank=True)
     tags = models.TextField(null=False, blank=True)
     servings_orig = models.DecimalField(default=1, max_digits=7, decimal_places=2, null=False, blank=True)
@@ -59,18 +59,20 @@ class Recipe(models.Model):
 
     calories_tot = models.IntegerField(default=0, null=False, blank=True)
 
-    time_prep = models.IntegerField(default=60, null=False, blank=True)
-    time_cook = models.IntegerField(default=60, null=False, blank=True)
-    time_tot = models.IntegerField(default=60, null=False, blank=True)
+    time_prep = models.IntegerField(default=0, null=False, blank=True)
+    time_cook = models.IntegerField(default=0, null=False, blank=True)
+    time_tot = models.IntegerField(default=0, null=False, blank=True)
 
     # time_prep = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
     # time_cook = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
     # time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
 
     directions = models.TextField(null=False, blank=True)
-    author = models.CharField(max_length=255, null=True, blank=True)
+    source = models.CharField(max_length=50, null=True, blank=True)
     owner = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(upload_to='recipe_img', null=True, blank=True)
+
+    edit_flag = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name

@@ -11,16 +11,57 @@ body {
 
 h1 {
     margin-top: 30px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
 }
 
-.star-crowd, .star-user {
-    width: 25px;
+.hidden {
+    display: none;
 }
 
-.nutrition-info {
+.popup {
+    display: block;
+}
+
+.popup-table {
     border-collapse: separate;
     border-spacing: 5px 0px;
+}
+
+.crud-btn {
+    width: 150px;
+    margin: 3px;
+}
+.attr-edit-input {
+    background-color: Pink;
+    margin: 3px;
+}
+
+.attr-save-btn {
+    width: 60px;
+    height: 26px;
+    margin: 3px;
+    padding: 3px;
+    background-color: LightSlateGray;
+}
+
+/* --------------------------------- */
+#name-editing {
+    height: 65px;
+    width: 600px;
+    position: relative;
+}
+
+#name-edit-input {
+    position: absolute;
+    bottom: 5px;
+    margin: 3px;
+}
+
+#name-save-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 14px;
+
 }
 
 .meta-info-spacer {
@@ -33,10 +74,19 @@ h1 {
     color: Gray;
 }
 
-.blank-row
-{
+.blank-row {
     height: 10px !important; /* Overwrite any previous rules */
-    background-color: #FFFFFF;
+}
+
+/* ---- Key Info Box --------------------------------------------- */
+#key-info-box {
+    position: relative;
+    width: 500px;
+    height: 155px;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+    /*background-color: #00FFFF;*/
 }
 
 .key-info-head {
@@ -51,9 +101,225 @@ h1 {
     color: Black;
 }
 
-.ingredient-list {
+/* --- Time ----------------- */
+#time-info {
+    position: absolute;
+    top: 5px;
+    left: 0px;
+    width: 150px;
+    height: 50px;
+    padding-top: 10px;
+    z-index: 10;
+}
+
+#time-popup {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: White;
+    border-style: solid;
+    border-color: Black;
+    z-index: 10;
+    width: 156px;
+}
+
+#time-editing {
+    position: absolute;
+    width: 350px;
+    height: 60px;
+}
+
+#time-editing-head {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: Black;
+}
+
+#time-editing-body {
+    position: absolute;
+    top: 20px;
+    left: 0px;
+}
+
+#time_prep-edit-input {
+    position: absolute;
+    top: 0px;
+    left: 20px;
+    width: 40px;
+    text-align: center;
+}
+
+.time-edit-text {
+    font-size: 110%;
+    font-weight: 700;
+    color: Black;
+    margin: 3px;
+}
+
+#time-edit-plus {
+    position: absolute;
+    top: 0px;
+    left: 80px;
+}
+
+#time_cook-edit-input {
+    position: absolute;
+    top: 0px;
+    left: 110px;
+    width: 40px;
+    text-align: center;
+}
+
+#time-edit-equals {
+    position: absolute;
+    top: 0px;
+    left: 180px;
+}
+
+#time_tot-edit-calc {
+    position: absolute;
+    top: 0px;
+    left: 215px;
+}
+
+#time-save-btn {
+    position: absolute;
+    top: 0px;
+    left: 271px;
+}
+
+#energy-info {
+    position: absolute;
+    top: 5px;
+    left: 165px;
+    width: 110px;
+    height: 50px;
+    padding-top: 10px;
+}
+
+#energy-popup {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: White;
+    border-style: solid;
+    border-color: Black;
+    z-index: 10;
+    width: 180px;
+}
+
+/* Description -------------- */
+#description-info {
+    position: absolute;
+    top: 140px;
+    left: 0px;
+    max-height: 80px;
+}
+
+#key-info-description {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 350px;
+    padding: 0px;
+}
+
+#description-edit-target {
+    max-height: 20px;
+}
+
+#description-edit-head {
+    position: absolute;
+    bottom: 50px;
+    left: 0px;
+    color: Black;
+}
+
+#description-edit-input {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
+#description-save-btn {
+    position: absolute;
+    bottom: 11px;
+    left: 271px;
+}
+
+/* Ratings ------------------ */
+#stars-tot {
+    position: absolute;
+    top: 7px;
+    right: 0px;
+    width: 135px;
+    height: 50px;
+    padding: 10px;
+    padding-right: 0px;
+}
+
+#stars-use {
+    position: absolute;
+    top: 77px;
+    right: 0px;
+    width: 135px;
+    height: 50px;
+    padding: 10px;
+    padding-right: 0px;
+}
+
+.star-crowd, .star-user {
+    width: 25px;
+}
+
+#nutr-rating-divider {
+/*    position: absolute;
+    top: 0px;
+*/}
+
+/* ---- End Key Info Box ----------------------------------------- */
+/* ---- Ingredient and Nutrition Info ---------------------------- */
+#ingredient-info {
+    position: relative;
+    width: 500px;
+    z-index: 10;
+}
+
+#ingred-box {
+    position: absolute;
+    width: 300px;
+    background-color: White;
+}
+
+#ingred-nutr-box {
+    position: absolute;
+    top: 0px;
+    left: 300px;
+    width: 200px;
+    background-color: White;
+}
+
+.ingred-list {
     line-height: 1.9;
 }
+
+.ingred-list-item {
+    width: 300px;
+}
+
+.ingred-list-highlight {
+    background-color: WhiteSmoke;
+}
+
+#nutr-table {
+    position: absolute;
+    left: 40px;
+    border-collapse: separate;
+    border-spacing: 5px 0px;
+}
+
+/* ---- End Ingredient and Nutrition Info ------------------------ */
 
  /*! Change .thumb from thumbnail-gallery.css: margin-bottom was 30px */
 .thumb {
@@ -76,5 +342,4 @@ p {
 
 #search_form {
     margin: 12px;
-
 }

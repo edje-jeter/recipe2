@@ -9,30 +9,34 @@
 <div class="row"><!-- Name and Header--><div class="box">
 
 <!-- /// #Name ////////////////////////////////////////////////// -->
-    <div id="name-section">
-        <div id="name-display"
-             class="col-lg-10
-                    col-md-10">
-            <h1>{{ recipe.name }}</h1>
-        </div>
+    <div id="name-section"
+         class="col-xs-12">
 
-        <div id="name-btn"
-             style="text-align: right"
-             class="col-lg-2
-                    col-md-2">
-            <a id="name-edit-btn"
-               class="btn btn-primary"
-               href="#"
-               role="button">Edit Name
-            </a>
-        </div>
+        <!-- Default View -->
+        <div id="name-editable"
+             class="attribute-editable">
+            <h1 id="name-edit-target"
+                >{{ recipe.name }}</h1>
+        </div><!-- /#name-editable -->
+
+        <!-- Edit View -->
+        <div id="name-editing"
+             class="attribute-editing hidden">
  
-    </div><!-- /#name-section -->
+            <h4 id="name-edit-head"
+                >Recipe Name (60 character max):</h4>
+            <textarea id="name-edit-input"
+                      class="attr-edit-input"
+                      rows="1"
+                      cols="70"
+                      maxlength="60"
+                      >{{ recipe.name }} </textarea> 
+            <a id='name-save-btn'
+               class='btn btn-primary attr-save-btn'
+               role='button'>Save</a>
+        </div><!-- /#name-editing -->
 
-<!-- /// Name/Header Divider //////////////////////////////// -->
-    <div id="name-header-divider">
-        <hr class="col-xs-12">
-    </div><!-- /#name-header-divider -->
+    </div><!-- /#name-section -->
 
 <!-- /// #Header Left Side ////////////////////////////////////// -->
     <div id="header-left-side"
@@ -50,7 +54,7 @@
             <img id="image-display"
                  class="col-md-12"
                  src="{% static 'img/food_default_300px.jpg' %}"
-                 alt="testing">
+                 alt="Please Upload an Image of the Prepared Recipe">
         {% endif %}
 
     </div><!-- /#header-left-side -->
@@ -62,164 +66,231 @@
                 col-sm-12
                 col-xs-12">
 
-    <!-- Key Info ............................................... -->
-        <div id="key-info" class="col-lg-5 col-md-4 col-sm-5 col-xs-12">
+        <div id="key-info-box">
 
-            <span class="key-info-col col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                <span class="key-info-head">
-                    Time
-                </span><br>
-                <span class="key-info-data">
-                    {{ recipe.time_tot }} mins
-                </span>
-            </span>
+    <!-- Time ............................................... -->
+        <div id="time-info">
+        <!-- Default View -->
+            <div id="time-editable"
+                 class="attribute-editable key-info-col"> 
+                <span class="key-info-head">Time</span><br>
+                <span id="time-default-data"
+                      class="key-info-data"
+                    ><span id="time-edit-target"
+                    >{{ recipe.time_tot }}</span> mins</span>
+            </div>
 
-            <span class="key-info-col col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                <span class="key-info-head">
-                    Energy
-                </span><br>
-                <span class="key-info-data">
-                    {{ energy_basic.energy_tot }} Cal
-                </span>
-            </span>
-
-        </div><!-- /#key-info -->
-
-    <!-- Nutrition Info ......................................... -->
-        <div id="nutr-info" class="col-lg-7 col-md-8 col-sm-7 col-xs-12">
-
-            <div class="key-info-col col-lg-6 col-md-7 col-sm-6 col-xs-12">
-                <table class="nutrition-info">
-                    <tr><td align="right">Carbs: </td>
-                        <td>{{ nutr_basic.carbs }} g ({{ energy_basic.energy_ptn }} Cal)</td></tr>
-                    <tr><td align="right">Protein: </td>
-                        <td>{{ nutr_basic.protein }} g ({{ energy_basic.energy_ptn }} Cal)</td></tr>
-                    <tr><td align="right">Fat: </td>
-                        <td>{{ nutr_basic.lipids }} g ({{ energy_basic.energy_fat }} Cal)</td></tr>
+        <!-- Popup -->
+            <div id="time-popup"
+                 class="popup hidden">
+                <table class="popup-table">
+                    <tr>
+                        <td align="right"><b>Total Time: </b></td>
+                        <td><b>{{ energy_basic.energy_tot }} mins</b></td></tr>
+                    <tr>
+                        <td align="right">Prep: </td>
+                        <td>{{ recipe.time_prep }} mins</td></tr>
+                    <tr>
+                        <td align="right">Cook: </td>
+                        <td>{{ recipe.time_cook }} mins</td></tr>
                 </table>
             </div>
 
-            <div class="key-info-col col-lg-6 col-md-5 col-sm-6 col-xs-12">
-                <table class="nutrition-info">
-                    <tr><td align="right">Fiber: </td>
-                        <td>{{ nutr_basic.fiber }} g</td></tr>
-                    <tr><td align="right">Sugars: </td>
-                        <td>{{ nutr_basic.sugars }} g</td></tr>
-                    <tr><td align="right">Sodium: </td>
-                        <td>{{ nutr_other.sodium }} mg</td></tr>
+        <!--- Edit View -->
+            <div id="time-editing"
+                 class="attribute-editing hidden">
+                <span id="time-editing-head"
+                      class="key-info-head"
+                    >Prep Time + Cook Time = Total Time (mins):</span>
+                <div id="time-editing-body">
+                    <input id="time_prep-edit-input"
+                              class="attr-edit-input"
+                              maxlength="5"
+                              value="{{ recipe.time_prep }}"></input> 
+                    <span id="time-edit-plus"
+                          class="time-edit-text"
+                          >+</span>
+                    <input id="time_cook-edit-input"
+                              class="attr-edit-input"
+                              maxlength="5"
+                              value="{{ recipe.time_cook }}"></input>
+                    <span id="time-edit-equals"
+                          class="time-edit-text"
+                          >=</span>
+                    <span id="time_tot-edit-calc"
+                          class="time-edit-text"
+                          >{{ recipe.time_tot }}</span>
+                    <a id='time-save-btn'
+                       class='btn btn-primary attr-save-btn'
+                       role='button'>Save</a>
+                </div><!-- /#time-editing-body -->
+            </div><!-- /#time-editing -->
+
+        </div><!-- /#time-info -->
+
+    <!-- Energy ............................................. -->
+        <!-- Default View -->
+            <div id="energy-info" class="attribute-editable key-info-col">
+                <span class="key-info-head">Energy</span><br>
+                <span id="energy-default-data"
+                      class="key-info-data"
+                    >{{ energy_basic.energy_tot }} Cal</span>
+
+        <!-- Popup -->
+                <div id="energy-popup"
+                     class="popup hidden">
+                    <table class="popup-table">
+                        <tr><td align="right"><b>Total Energy: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
+                        <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                        <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                        <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
+                    </table>
+                </div>
+            </div><!-- /#energy-info -->
+
+    <!-- Rating ............................................. -->
+            <div id="rating-info">
+
+                <div id="stars-tot">
+                    <span id="stars-total"></span>
+                    <br>
+                    <span id="stars-tot-data"
+                        ><span id="raters-total"
+                            >{{ rating_stat_v.count }}</span>
+                        <span id="stars-tot-labels"
+                            > ratings; avg: </span>
+                        <span id="rating-total"
+                            >{{ rating_stat_v.avg }}</span></span>
+                </div>
+
+                <div id="stars-use">
+                    <span id="stars-user"></span>
+                    <br>
+
+                    <span id="hidden-rating-saved"
+                          style="display: none;"
+                    >{{ rating_v.rating }}</span>
+
+                    {% if rating_v.rating == -1 %}
+                        Sign-in to rate
+                    {% elif rating_v.rating == 0 %}
+                        Add your rating
+                    {% else %}
+                        <a id="rating-remove" href="#">Remove your rating</a>
+                    {% endif %}
+
+                </div>
+            </div><!-- /#rating-info -->
+
+    <!-- Description ........................................ -->
+            <div id="description-info">
+
+                <div id="key-info-description">
+                    <!-- Default View -->
+                    <div id="description-editable"
+                         class="attribute-editable">
+                        <span class="key-info-head"
+                            >Description:</span><br>
+                        <span class="meta-info-data"
+                              id="description-edit-target"
+                            >{{ recipe.description }}</span>
+                    </div>
+
+                    <!-- Edit View -->
+                    <div id="description-editing"
+                         class="attribute-editing hidden">
+                        <span id="description-edit-head"
+                              class="key-info-head"
+                            >Description (100 character max):</span><br>
+                        <textarea id="description-edit-input"
+                                  class="attr-edit-input"
+                                  rows="2"
+                                  cols="35"
+                                  maxlength="100"
+                                  >{{ recipe.description }} </textarea> 
+                        <a id='description-save-btn'
+                           class='btn btn-primary attr-save-btn'
+                           role='button'>Save</a><br>
+                    </div>
+
+                </div><!-- /#key-info-description -->
+
+            </div><!-- /#description-info -->
+
+        </div><!-- /#key-info-box -->
+
+    <!-- Ingredients ............................................ -->
+        <div id="ingredient-info">
+            <div id="ingred-box">
+        <!-- Ingred List Output 0 ................................... -->
+                <span id="ingred-list-output-0"
+                    ><h4>
+                        Ingredients for 
+                        <span id="servings-display"></span>
+                        <span id="servings-change"></span>
+                    </h4>
+
+                    <div class="ingred-list">
+                    {% for quant in recipe.quantity_set.all %}
+                        <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
+                              class="ingred-list-item"
+                            ><span class="qty-common"
+                            >{{ quant.qty_common }}</span>&nbsp;<span
+                            >{{ quant.ingred.label }} </span><span
+                            >{{ quant.name_common }} </span><br>
+                        </div>
+                    {% endfor %}
+                    </div>
+                
+        <!-- Ingred List Output 1 ................................... -->
+                <span id='ingred-list-output-1'></span>
+                <br>
+
+        <!-- Ingred List Output 2 ................................... -->
+                <span id='ingred-list-output-2'
+                    ><a id='ingred-add-btn'
+                       class='btn btn-primary'
+                       role='button'>Add Ingredient</a></span><br>
+
+        <!-- Ingred List Output 3 ................................... -->
+                <strong id='ingred-list-output-3'>
+                </strong>
+
+            </div><!-- /#ingred-box -->
+
+            <div id="ingred-nutr-box">
+            <!-- Right Side Head ........................................ -->
+                <h4 id="right-side-head">
+                    Nutrition per Serving:
+                </h4>
+
+            <!-- Right Side Body ........................................ -->
+                <span id="right-side-body">
+                <table id="nutr-table">
+                    <tr><td align="right"><b>Calories: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
+                    <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                    <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                    <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
+                    <tr class="blank-row"><td colspan="3"></td></tr>
+                    <tr><td align="right"><b>Mass: </b></td><td><b>{{ mass_basic }} g</b></td></tr>
+                    <tr><td align="right">Carbs: </td><td>{{ nutr_basic.carbs }} g</td></tr>
+                    <tr><td align="right">Protein: </td><td>{{ nutr_basic.protein }} g</td></tr>
+                    <tr><td align="right">Fat: </td><td>{{ nutr_basic.lipids }} g</td></tr>
+                    <tr><td align="right">Fiber: </td><td>{{ nutr_basic.fiber }} g</td></tr>
+                    <tr><td align="right">Sugars: </td><td>{{ nutr_basic.sugars }} g</td></tr>
+                    <tr><td align="right">Water: </td><td>{{ nutr_basic.water }} g</td></tr>
+                    <tr><td align="right">Sodium: </td><td>{{ nutr_other.sodium }} mg</td></tr>
                 </table>
-            </div>
+                </span>
+            </div><!-- /#ingred-nutr-box -->
 
-        </div><!-- /#nutr-info -->
-
-    <!-- Nutr/Voting Divider ...................................... -->
-        <div id="nutr-voting-divider">
-            <hr class="col-xs-12">
-        </div><!-- /#nutr-voting-divider -->
-
-    <!-- Voting ................................................. -->
-        <div id="voting" class="col-sm-8 col-xs-12">
-
-            <div id="stars-tot" class="col-xs-6">
-                <span id="stars-total"></span>
-                <br>
-                <span id="raters-total">{{ rating_stat_v.count }}</span> ratings; avg: 
-                <span id="rating-total">{{ rating_stat_v.avg }}</span>
-            </div>
-
-            <div id="stars-use" class="col-xs-6">
-                <span id="stars-user"></span>
-                <br>
-
-                <span id="hidden-rating-saved"
-                      style="display: none;"
-                >{{ rating_v.rating }}</span>
-
-                {% if rating_v.rating == -1 %}
-                    Sign-in to rate
-                {% elif rating_v.rating == 0 %}
-                    Add your rating
-                {% else %}
-                    <a id="rating-remove" href="#">Remove your rating</a>
-                {% endif %}
-
-            </div>
-
-        <br><br><br>
-
-            <div class="col-xs-12">
-                {% if active %}
-                    {# vote state = {{ vote_v.state }}<br> #}
-                    <a href="/vote_up_func/{{ recipe.pk }}">
-                        Vote Up
-                    </a> ({{ vote_stat_v.v_up }} votes [{{ vote_stat_v.v_up_p }}%])
-                    
-                    <a href="/vote_dn_func/{{ recipe.pk }}">
-                        Vote Down
-                    </a> ({{ vote_stat_v.v_dn }} votes [{{ vote_stat_v.v_dn_p }}%])
-
-                {% else %}
-                    You must be signed-in to vote <br>
-                    ({{ vote_stat_v.v_up }} up-votes [{{ vote_stat_v.v_up_p }}%]) --- 
-                    ({{ vote_stat_v.v_dn }} down-votes [{{ vote_stat_v.v_dn_p }}%])
-
-                {% endif %}
-            
-            <br><br>
-            </div>
-
-        </div><!-- /#voting -->
-
-    <!-- Meta Info .............................................. -->
-        <div id="meta-info" class="col-xs-8">
-            
-            <p class="meta-info-spacer">
-            <span class="meta-info-head">Description:</span><br>
-            <span class="meta-info-data">{{ recipe.description }}</span>
-            </p>
-
-            <p class="meta-info-spacer">
-            <span class="meta-info-head">Tags:</span><br>
-            <span class="meta-info-data">{{ recipe.tags }}</span>
-            </p>
-            
-            <p class="meta-info-spacer">
-            <span class="meta-info-head">Source:</span><br>
-            <span class="meta-info-data">{{ recipe.author }}</span>
-            </p>
-        </div><!-- / Meta Info -->
-
-    <!-- Edit, Delete, Add ...................................... -->
-        <div id="edit-delete-add" class="col-xs-4" style="text-align: right">
-
-            <a id="recipe-edit-btn"
-               class="btn btn-primary"
-               href="/recipe_edit/{{ recipe.pk }}"
-               role="button">Edit Recipe
-            </a>
-            <br><br>
-
-            <a id="recipe-delete-btn"
-               class="btn btn-primary"
-               href="/recipe_delete_page/{{ recipe.pk }}"
-               role="button">Delete Recipe
-            </a>
-            <br><br>
-
-            <a id="recipe-add-btn"
-               class="btn btn-primary"
-               href="/recipe_create/"
-               role="button">Add Recipe
-            </a>
-
-        </div><!-- /#edit-delete-add -->
-
+        </div><!-- /#ingredient-info -->
     </div><!-- /#header-right-side -->
 
 <!-- /// #Header/Section Divider //////////////////////////////// -->
-    <div id="header-section-divider">
+    {% comment %}<div id="header-section-divider">
         <hr class="col-xs-12">
-    </div><!-- /#header-section-divide -->
+    </div><!-- /#header-section-divide -->{% endcomment %}
 
 </div><!-- /.box --></div><!-- /.row Name and Header -->
 
@@ -230,43 +301,70 @@
          class="col-lg-6
                 col-md-6">
         
-    <!-- Ingred List Output 0 ................................... -->
-        <span id="ingred-list-output-0">
-            <h4>
-                Ingredients for 
-                <span id="servings-display"></span>
-                <span id="servings-change"></span>
-            </h4>
+    <!-- Meta Info .............................................. -->
+        {% comment %}<!--
+        <div id="meta-info" class="col-xs-8">
 
-            <p class="ingredient-list">
-            {% for quant in recipe.quantity_set.all %}
-                <span class='qty-common'>{{ quant.qty_common }}</span>
-                 {{ quant.ingred.label }}
-                 {{ quant.name_common }}
-                 <br>
-            {% endfor %}
-            </p>
+            <div id="meta-info-tags">
+                <p class="meta-info-spacer">
+                <span class="meta-info-head">Tags:</span><br>
+                <span class="meta-info-data">{{ recipe.tags }}</span>
+                </p>
+            </div><!-- /#meta-info-tags -->
+            
+            <div id="meta-info-source">
+                <!-- Default View -->
+                <div id="source-editable"
+                     class="attribute-editable">
+                    <p class="meta-info-spacer">
+                        <span class="meta-info-head"
+                            >Source:</span><br>
+                        <span id="source-edit-target"
+                              class="meta-info-data"
+                            >{{ recipe.author }}</span>
+                    </p>
+                </div>
 
-        </span>
-        
-    <!-- Ingred List Output 1 ................................... -->
-        <span id='ingred-list-output-1'>
-        </span>
-        <br>
+                <!-- Edit View -->
+                <div id="source-editing"
+                     class="attribute-editing hidden">
+                    <span id="source-edit-head"
+                          class="meta-info-head"
+                        >Source (250 character max):</span><br>
+                    <textarea id="source-edit-input"
+                              class="attr-edit-input"
+                              rows="3"
+                              cols="35"
+                              maxlength="50"
+                              >{{ recipe.source }} </textarea> 
+                    <a id='source-save-btn'
+                       class='btn btn-primary attr-save-btn'
+                       role='button'>Save</a><br>
+                </div><!-- /#source-editing -->
 
-    <!-- Ingred List Output 2 ................................... -->
-        <span id='ingred-list-output-2'>
-        <a id='ingred-add-btn'
-           class='btn btn-primary'
-           href='#'
-           role='button'>Add Ingredient
-        </a>
-        </span>
-        <br>
+            </div><!-- /#meta-info-source -->
 
-    <!-- Ingred List Output 3 ................................... -->
-        <strong id='ingred-list-output-3'>
-        </strong>
+        </div><!-- / Meta Info -->
+        -->{% endcomment %}
+
+    <!-- Edit, Delete, Add ...................................... -->
+        <div id="edit-delete-add" class="col-xs-4" style="text-align: right">
+
+            <a id="recipe-edit-btn"
+               class="btn btn-primary crud-btn"
+               role="button">Edit Recipe</a>
+
+            <a id="recipe-delete-btn"
+               class="btn btn-primary crud-btn"
+               href="/recipe_delete_page/{{ recipe.pk }}"
+               role="button">Delete Recipe</a>
+
+            <a id="recipe-add-btn"
+               class="btn btn-primary crud-btn"
+               href="/recipe_create/"
+               role="button">Add Recipe</a>
+
+        </div><!-- /#edit-delete-add -->
 
     </div><!-- /#left-side-section -->
 
@@ -275,30 +373,6 @@
          class="col-lg-6
                 col-md-6">
         
-    <!-- Right Side Head ........................................ -->
-        <h4 id="right-side-head">
-            Basic Nutrition Information per Serving:
-        </h4>
-
-    <!-- Right Side Body ........................................ -->
-        <span id="right-side-body">
-        <table id="nutrition-info" style="width:60%">
-            <tr><td align="right"><b>Total Calories: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
-            <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
-            <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
-            <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
-            <tr class="blank-row"><td colspan="3"></td></tr>
-            <tr><td align="right"><b>Approximate Mass: </b></td><td><b>{{ mass_basic }} g</b></td></tr>
-            <tr><td align="right">Carbs: </td><td>{{ nutr_basic.carbs }} g</td></tr>
-            <tr><td align="right">Protein: </td><td>{{ nutr_basic.protein }} g</td></tr>
-            <tr><td align="right">Fat: </td><td>{{ nutr_basic.lipids }} g</td></tr>
-            <tr><td align="right">Fiber: </td><td>{{ nutr_basic.fiber }} g</td></tr>
-            <tr><td align="right">Sugars: </td><td>{{ nutr_basic.sugars }} g</td></tr>
-            <tr><td align="right">Water: </td><td>{{ nutr_basic.water }} g</td></tr>
-            <tr><td align="right">Sodium: </td><td>{{ nutr_other.sodium }} mg</td></tr>
-        </table>
-        </span>
-
     </div><!-- /#right-side-section -->
 
 <!-- /// Section/Bottom Divider ///////////////////////////////// -->
@@ -495,6 +569,134 @@
         ratingMouseOver(ratingSaved);
     });
 
+    // Time info popup
+    $('#time-info').on('mouseover', function() {
+        console.log("time-info mouseover");
+        $('#time-popup').removeClass('hidden');
+        $('#time-default-data').addClass('hidden');
+    });
+
+    $('#time-info').on('mouseout', function() {
+        $('#time-popup').addClass('hidden');
+        $('#time-default-data').removeClass('hidden');
+    });
+
+    // Energy info popup
+    $('#energy-info').on('mouseover', function() {
+        console.log("energy-info mouseover");
+        $('#energy-popup').removeClass('hidden');
+        $('#energy-default-data').addClass('hidden');
+    });
+
+    $('#energy-info').on('mouseout', function() {
+        $('#energy-popup').addClass('hidden');
+        $('#energy-default-data').removeClass('hidden');
+    });
+
+    // Edit an Attribute in the Name or Header ----------------------
+    $('#recipe-edit-btn').on('click', function() {
+        console.log("edit btn")
+
+        $('.attribute-editable').addClass('hidden');
+        $('.attribute-editing').removeClass('hidden');
+        $('#name-edit-input').focus();
+
+        $('#time_prep-edit-input').on('keyup', function() {
+            timeTotCalc();
+        });
+        $('#time_cook-edit-input').on('keyup', function() {
+            timeTotCalc();
+        });
+
+        var timeTotCalc = function() {
+            timePrep = Number($('#time_prep-edit-input').val());
+            timeCook = Number($('#time_cook-edit-input').val());
+            $('#time_tot-edit-calc').text(timePrep + timeCook);
+        };
+    });
+
+    // Click on item in ingredient list; get ndb_no
+    $('.ingred-list-item').on('click', function() {
+        var itemNdbNo = this.id.split(/[-]/)[1];
+        console.log(itemNdbNo);
+    });
+
+    $('.ingred-list-item').on('mouseover', function() {
+        var itemID = this.id;
+        $('#' + itemID).addClass('ingred-list-highlight');
+
+        // var itemNdbNo = itemID.split(/[-]/)[1];
+        // console.log(itemNdbNo);
+    });
+        
+    $('.ingred-list-item').on('mouseout', function() {
+        var itemID = this.id;
+        $('#' + itemID).removeClass('ingred-list-highlight');
+    });
+
+
+    // Click on the "Save" button for an edited attribute
+    // Get the name of the attribute
+    $('.attr-save-btn').on('click', function() {
+        console.log("attr-save-btn clicked");
+        
+        var attribute = this.id.split(/[-]/)[0];
+        console.log(attribute)
+
+        // Handle the Time attributes
+        if(attribute == "time") {
+            timeValue(attribute);
+        } else {
+            attrValue(attribute);
+        };
+    });
+
+    // Read edited attribute input values for a given attribute
+    var attrValue = function(attribute) {
+        var inputID = '#' + attribute + '-edit-input';
+        console.log(inputID);
+        var newValue = $(inputID).val();
+        console.log(newValue);
+        var pAttr = attribute;
+
+        attrSave(pAttr, attribute, newValue)
+    };
+
+    // 
+    var timeValue = function(attribute) {
+        pAttr = attribute
+        timePrep = Number($('#time_prep-edit-input').val());
+        timeCook = Number($('#time_cook-edit-input').val());
+        timeTot = timePrep + timeCook;
+        console.log("timeTot: " + timeTot);
+
+        attrSave(pAttr, 'time_prep', timePrep);
+        attrSave(pAttr, 'time_cook', timeCook);
+        attrSave(pAttr, 'time_tot', timeTot);
+    };
+
+    // Accept and save edited value for given attribute; pAttr
+    // (parent attribute) deals with multi-value cases like "time"
+    var attrSave = function(pAttr, attribute, newValue) {
+        console.log("attrSave func initiated");
+
+        $.ajax({
+            type: 'GET',
+            url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
+            data: { attr: attribute,
+                    new_value: newValue,
+                   },
+            error: function() {},
+            success: function() {
+                console.log("attrSave func executed");
+
+                $('#' + pAttr + '-editable').removeClass('hidden');
+                $('#' + pAttr + '-editing').addClass('hidden');
+                $('#' + pAttr + '-edit-target').text(newValue);
+            }
+        });
+    };
+
     // Set up user rating by changing star colors as the mouse touches
     var ratingMouseOver = function(ratingSaved) {
         $('.star-user').on('mouseleave', function() {
@@ -550,45 +752,33 @@
                 location.reload(true);
             }
         });
-
-        // $.ajax({
-        //     type: 'GET',
-        //     url: '/rating_stats_func/' + {{ recipe.pk }},
-        //     data: { },
-        //     error: function() {},
-        //     success: function() {
-        //         location.reload(true);
-        //     }
-        // });
     };
 
-    // Display input box to edit common name of recipe
+    // Display input box to edit common name of ingredient
     $('#ingred-add-btn').on('click', function() {
         addIngredient();
     });
 
     var addIngredient = function() {
-        // $('#ingred-add-btn').on('click', function() {
-            var btnID = 'ingred-common-name-add-btn'
-            var btnText = 'Add Ingredient Common Name'
-            var inputID = 'common-name-input'
-            var attribute = 'name_common'
+        var btnID = 'ingred-common-name-add-btn'
+        var btnText = 'Add Ingredient Common Name'
+        var inputID = 'common-name-input'
+        var attribute = 'name_common'
 
-            $('#ingred-list-output-2').text('').append(  
-                "Enter the ingredient common-name: " +
-                "<input id=" + inputID + " type='text'></input> " +
-                "<a id='" + btnID + "'" +
-                   "class='btn btn-primary'" +
-                   "href='#'" +
-                   "role='button'>" + btnText +
-                "</a>"
-            );
-            $('#' + inputID).focus();
-            nameCommonSave(inputID, btnID, attribute);
-        // });
+        $('#ingred-list-output-2').text('').append(  
+            "Enter the ingredient common-name: " +
+            "<input id=" + inputID + " type='text'></input> " +
+            "<a id='" + btnID + "'" +
+               "class='btn btn-primary'" +
+               "role='button'>" + btnText +
+            "</a>"
+        );
+
+        $('#' + inputID).focus();
+        nameCommonSave(inputID, btnID, attribute);
     };
 
-    // Accept and save edited common name of recipe
+    // Accept and save edited common name of ingredient
     var nameCommonSave = function(inputID, btnID, attribute) {
         $('#' + btnID).on('click', function() {
             var nameCommon = $('#' + inputID).val()
@@ -610,7 +800,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '/json_ingred_ndb_2/',
+                url: '/get_ingred_ndb_json/',
                 data: { search: nameCommon },
                 error: function() {},
                 success: function(data) {
@@ -696,7 +886,6 @@
                        "type='text'></input> " +
                 "<a id='quantity-save-btn'" +
                    "class='btn btn-primary'" +
-                   "href='#'" +
                    "role='button'>Save Quantity" +
                 "</a>"
             );
@@ -723,7 +912,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '/recipe_attr_edit_func2/' + {{ recipe.pk }},
+                url: '/add_quantity/' + {{ recipe.pk }},
                 data: { name_common: nameCommon,
                         ndb_num: num,
                         ndb_desc: desc,
@@ -749,7 +938,6 @@
                 "</input> " +
                 "<a id='name-save-btn'" +
                    "class='btn btn-primary'" +
-                   "href='#'" +
                    "role='button'>Save Changes to Recipe Name" +
                 "</a><br>"
             );
@@ -787,7 +975,6 @@
             $('#servings-change').text('').append(
                 "<a id='servings-save-btn'" +
                    "class='btn btn-primary'" +
-                   "href='#'" +
                    "role='button'>Save Change" +
                 "</a>"
             );
