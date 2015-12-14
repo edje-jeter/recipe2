@@ -1,3 +1,4 @@
+import json
 import requests
 import re
 
@@ -79,6 +80,7 @@ def GetNutrInfo(nutr_list):
                        291: ['fiber', 0],
                        269: ['sugars', 0],
                        307: ['sodium', 0],
+                       997: ['energy_cho', 0],
                        998: ['energy_ptn', 0],
                        999: ['energy_fat', 0],
                        }
@@ -92,10 +94,19 @@ def GetNutrInfo(nutr_list):
         if nutr_id in basic_nutr_info:
             basic_nutr_info[nutr_id][1] = float(nutr['value'])
 
+    # Calculate energy contributions from Protein, Lipids, Carbs
     energy_tot = basic_nutr_info[208][1]
 
-    basic_nutr_info[998][1] = energy_tot * 4 / 17
-    basic_nutr_info[999][1] = energy_tot * 9 / 17
+    protein_en = 4 * basic_nutr_info[203][1]
+    fat_en = 9 * basic_nutr_info[204][1]
+    carbs_en = 4 * basic_nutr_info[205][1]
+
+    energy_calc = protein_en + fat_en + carbs_en
+    ratio = energy_tot / energy_calc
+
+    basic_nutr_info[997][1] = carbs_en * ratio
+    basic_nutr_info[998][1] = protein_en * ratio
+    basic_nutr_info[999][1] = fat_en * ratio
 
     return [basic_nutr_info, full_nutr_info]
 
@@ -131,6 +142,8 @@ def MakeNewIngredNutr(ingred, measures, basic_nutr_info):
         ingred_nutr, created = IngredNutr.objects.get_or_create(handle=handle,
                                                                 ndb_id=ingred)
 
+        ingred_nutr.ndb_num = num
+
         ingred_nutr.eqv = eqv
         ingred_nutr.qty = qty
         ingred_nutr.label = label
@@ -144,6 +157,7 @@ def MakeNewIngredNutr(ingred, measures, basic_nutr_info):
         ingred_nutr.sodium = basic_nutr_info[307][1] * prop
 
         ingred_nutr.energy_tot = basic_nutr_info[208][1] * prop
+        ingred_nutr.energy_cho = basic_nutr_info[997][1] * prop
         ingred_nutr.energy_ptn = basic_nutr_info[998][1] * prop
         ingred_nutr.energy_fat = basic_nutr_info[999][1] * prop
 
@@ -200,10 +214,8 @@ def get_ingred_ndb_json(request):
 
 def JsonIngredNutr(request):
     ndb_no = request.GET.get('search2', '')
-    # print "ndb_no: %s" % ndb_no
 
     nutr_list = NDBQuery(ndb_no)
-    # print "nutr_list: %s" % nutr_list
 
     ingred = IngredNDB.objects.get(ndb_no=ndb_no)
     measures = nutr_list[0]['measures']
@@ -292,33 +304,53 @@ def tabulate_basic_nutr(recipe):
     nutr_other_mg = {'sodium': 0}
 
     energy_basic = {'energy_tot': 0,
+                    'energy_cho': 0,
                     'energy_ptn': 0,
                     'energy_fat': 0,
                     }
+
+    nutr_individ = {}
 
     servings = recipe.servings_orig
     # Retrieve and sum nutrition values for each nutrient in each ingredient
     for quant in recipe.quantity_set.all():
 
         qty_prop = quant.qty_prop
+        ingred_obj = quant.ingred
+
+        ingred_num = quant.ingred.ndb_num
+        nutr_individ[ingred_num] = {'nutr_basic_g': {},
+                                    'nutr_other_mg': {},
+                                    'energy_basic': {},
+                                    'mass': 0
+                                    }
 
         for nutr in nutr_basic_g:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_basic_g[nutr] += nutr_value * qty_prop
+            nutr_value = getattr(ingred_obj, nutr)
+            value_scaled = nutr_value * qty_prop
+
+            nutr_basic_g[nutr] += value_scaled
+            nutr_individ[ingred_num]['nutr_basic_g'][nutr] = value_scaled
 
         for nutr in nutr_other_mg:
-            nutr_value = getattr(quant.ingred, nutr)
-            nutr_other_mg[nutr] += nutr_value * qty_prop
+            nutr_value = getattr(ingred_obj, nutr)
+            value_scaled = nutr_value * qty_prop
+
+            nutr_other_mg[nutr] += value_scaled
+            nutr_individ[ingred_num]['nutr_other_mg'][nutr] = value_scaled
 
         for energy in energy_basic:
-            energy_value = getattr(quant.ingred, energy)
-            energy_basic[energy] += energy_value * qty_prop
+            energy_value = getattr(ingred_obj, energy)
+            value_scaled = energy_value * qty_prop
 
-    return [nutr_basic_g, nutr_other_mg, energy_basic, servings]
+            energy_basic[energy] += value_scaled
+            nutr_individ[ingred_num]['energy_basic'][energy] = value_scaled
+
+    return [nutr_basic_g, nutr_other_mg, energy_basic, servings, nutr_individ]
 
 
 # ---- Scale Nutrition Info per serving; deal with decimals ---------
-def scale_basic_nutr(nutr_basic_g, nutr_other_mg, energy_basic, servings):
+def scale_basic_nutr(nutr_basic_g, nutr_other_mg, energy_basic, servings, nutr_individ):
     mass_basic = 0
     for nutr in nutr_basic_g:
         mass = nutr_basic_g[nutr] / servings
@@ -335,7 +367,26 @@ def scale_basic_nutr(nutr_basic_g, nutr_other_mg, energy_basic, servings):
 
     mass_basic = int(round(mass_basic, 0))
 
-    return [nutr_basic_g, nutr_other_mg, energy_basic, mass_basic]
+    for nutr in nutr_individ:
+        mass_individ = 0
+        for bas in nutr_individ[nutr]['nutr_basic_g']:
+            mass = nutr_individ[nutr]['nutr_basic_g'][bas] / servings
+            nutr_individ[nutr]['nutr_basic_g'][bas] = int(round(mass, 0))
+            mass_individ += mass
+
+        for other in nutr_individ[nutr]['nutr_other_mg']:
+            mass = nutr_individ[nutr]['nutr_other_mg'][other] / servings
+            nutr_individ[nutr]['nutr_other_mg'][other] = int(round(mass, 0))
+            mass_individ += mass / 1000
+
+        for bas in nutr_individ[nutr]['energy_basic']:
+            mass = nutr_individ[nutr]['energy_basic'][bas] / servings
+            nutr_individ[nutr]['energy_basic'][bas] = int(round(mass, 0))
+
+        nutr_individ[nutr]['mass'] = int(round(mass_individ, 0))
+
+    return [nutr_basic_g, nutr_other_mg,
+            energy_basic, mass_basic, nutr_individ]
 
 
 # ---- Get Rating and Rating Stats ----------------------------------
@@ -401,7 +452,7 @@ def recipe_detail(request, pk):
     tab = tabulate_basic_nutr(recipe)
 
     # Account for servings per recipe; round numbers; calc total mass
-    sca = scale_basic_nutr(tab[0], tab[1], tab[2], tab[3])
+    sca = scale_basic_nutr(tab[0], tab[1], tab[2], tab[3], tab[4])
 
     # Save the total number of calories per serving to the database
     recipe.calories_tot = sca[2]['energy_tot']
@@ -427,6 +478,11 @@ def recipe_detail(request, pk):
     context['nutr_other'] = sca[1]
     context['energy_basic'] = sca[2]
     context['mass_basic'] = sca[3]
+
+    context['nutr_individ'] = json.dumps(sca[4])
+
+    # print  "%s" % json.dumps(sca[4])
+    context['text_dict'] = json.dumps(sca[4])
 
     context['active'] = active
 

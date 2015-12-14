@@ -21,6 +21,7 @@ class IngredNDB(models.Model):
 
 class IngredNutr(models.Model):
     ndb_id = models.ForeignKey(IngredNDB)
+    ndb_num = models.CharField(max_length=255, null=False, blank=True)
     handle = models.CharField(max_length=255, null=False, blank=True)
 
     eqv = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
@@ -41,6 +42,7 @@ class IngredNutr(models.Model):
     energy_tot = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
     energy_ptn = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
     energy_fat = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
+    energy_cho = models.DecimalField(default=0, max_digits=7, decimal_places=3, null=False, blank=True)
 
     def __unicode__(self):
         return self.handle

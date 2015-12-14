@@ -224,11 +224,12 @@
             <div id="ingred-box">
         <!-- Ingred List Output 0 ................................... -->
                 <span id="ingred-list-output-0"
-                    ><h4>
-                        Ingredients for 
-                        <span id="servings-display"></span>
-                        <span id="servings-change"></span>
-                    </h4>
+                    ><h4>Ingredients</h4>
+
+                    <span id="servings-label"
+                        >Number of Servings: </span>
+                    <span id="servings-display"></span>
+                    <span id="servings-change"></span>
 
                     <div class="ingred-list">
                     {% for quant in recipe.quantity_set.all %}
@@ -249,8 +250,8 @@
         <!-- Ingred List Output 2 ................................... -->
                 <span id='ingred-list-output-2'
                     ><a id='ingred-add-btn'
-                       class='btn btn-primary'
-                       role='button'>Add Ingredient</a></span><br>
+                       class='btn btn-primary servings-btn'
+                       role='button'>Add Another Ingredient</a></span><br>
 
         <!-- Ingred List Output 3 ................................... -->
                 <strong id='ingred-list-output-3'>
@@ -261,25 +262,101 @@
             <div id="ingred-nutr-box">
             <!-- Right Side Head ........................................ -->
                 <h4 id="right-side-head">
-                    Nutrition per Serving:
+                    Nutrition per Serving
                 </h4>
-
-            <!-- Right Side Body ........................................ -->
+                
+            <!-- Right Side Body / Nutr Table ................... -->
                 <span id="right-side-body">
-                <table id="nutr-table">
-                    <tr><td align="right"><b>Calories: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
-                    <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
-                    <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
-                    <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
+                <table id="nutr-table"
+                       class="nutr-table-normal">
+                    <tr><td class="nutr-label">Calories: </td>
+                        <td class="nutr-data nutr-data-leader"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_tot }}</span
+                            ><span id="nutr-data-energy_tot"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+
+                    <tr><td class="nutr-label">Carbs: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_cho }}</span
+                            ><span id="nutr-data-energy_cho"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+                    <tr><td class="nutr-label">Protein: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_ptn }}</span
+                            ><span id="nutr-data-energy_ptn"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+                    <tr><td class="nutr-label">Fat: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_fat }}</span
+                            ><span id="nutr-data-energy_fat"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+
                     <tr class="blank-row"><td colspan="3"></td></tr>
-                    <tr><td align="right"><b>Mass: </b></td><td><b>{{ mass_basic }} g</b></td></tr>
-                    <tr><td align="right">Carbs: </td><td>{{ nutr_basic.carbs }} g</td></tr>
-                    <tr><td align="right">Protein: </td><td>{{ nutr_basic.protein }} g</td></tr>
-                    <tr><td align="right">Fat: </td><td>{{ nutr_basic.lipids }} g</td></tr>
-                    <tr><td align="right">Fiber: </td><td>{{ nutr_basic.fiber }} g</td></tr>
-                    <tr><td align="right">Sugars: </td><td>{{ nutr_basic.sugars }} g</td></tr>
-                    <tr><td align="right">Water: </td><td>{{ nutr_basic.water }} g</td></tr>
-                    <tr><td align="right">Sodium: </td><td>{{ nutr_other.sodium }} mg</td></tr>
+
+                    <tr><td class="nutr-label">Mass: </td>
+                        <td class="nutr-data nutr-data-leader"
+                            ><span class="nutr-cumulative"
+                                >{{ mass_basic }}</span
+                            ><span id="nutr-data-mass"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Carbs: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.carbs }}</span
+                            ><span id="nutr-data-carbs"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Protein: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.protein }}</span
+                            ><span id="nutr-data-protein"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Fat: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.lipids }}</span
+                            ><span id="nutr-data-lipids"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Fiber: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.fiber }}</span
+                            ><span id="nutr-data-fiber"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Sugars: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.sugars }}</span
+                            ><span id="nutr-data-sugars"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Water: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.water }}</span
+                            ><span id="nutr-data-water"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Sodium: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_other.sodium }}</span
+                            ><span id="nutr-data-sodium"
+                                   class="nutr-individ"
+                                ></span> mg</td></tr>
                 </table>
                 </span>
             </div><!-- /#ingred-nutr-box -->
@@ -348,7 +425,7 @@
         -->{% endcomment %}
 
     <!-- Edit, Delete, Add ...................................... -->
-        <div id="edit-delete-add" class="col-xs-4" style="text-align: right">
+        <div id="edit-delete-add" class="col-xs-6" style="text-align: right">
 
             <a id="recipe-edit-btn"
                class="btn btn-primary crud-btn"
@@ -358,11 +435,6 @@
                class="btn btn-primary crud-btn"
                href="/recipe_delete_page/{{ recipe.pk }}"
                role="button">Delete Recipe</a>
-
-            <a id="recipe-add-btn"
-               class="btn btn-primary crud-btn"
-               href="/recipe_create/"
-               role="button">Add Recipe</a>
 
         </div><!-- /#edit-delete-add -->
 
@@ -391,9 +463,8 @@
                 col-md-6">
 
         <div id="directions-head">
-            <h4>
-                Directions:
-            </h4>
+            <h4
+                >Directions</h4>
         </div>
 
         <div id="directions-display">
@@ -478,18 +549,12 @@
             servTemp = servOrig
         };
 
-        if(servTemp == 1) {
-            servTempStr = "1 serving: "
-        } else {
-            servTempStr = servTemp + " servings: "
-        }
-
         $('#servings-display').text('').append(
-            servTempStr
+            servTemp
         );
         $('#servings-change').text('').append(
             "<a id='servings-scale-btn'" +
-               "class='btn btn-primary'" +
+               "class='btn btn-primary servings-btn'" +
                "href='#'" +
                "role='button'>Change" +
             "</a>"
@@ -583,7 +648,7 @@
 
     // Energy info popup
     $('#energy-info').on('mouseover', function() {
-        console.log("energy-info mouseover");
+        // console.log("energy-info mouseover");
         $('#energy-popup').removeClass('hidden');
         $('#energy-default-data').addClass('hidden');
     });
@@ -618,20 +683,70 @@
     // Click on item in ingredient list; get ndb_no
     $('.ingred-list-item').on('click', function() {
         var itemNdbNo = this.id.split(/[-]/)[1];
-        console.log(itemNdbNo);
     });
 
     $('.ingred-list-item').on('mouseover', function() {
         var itemID = this.id;
         $('#' + itemID).addClass('ingred-list-highlight');
 
-        // var itemNdbNo = itemID.split(/[-]/)[1];
-        // console.log(itemNdbNo);
+        var itemNdbNo = itemID.split(/[-]/)[1];
+
+        $('.nutr-cumulative').addClass('hidden')
+        $('.nutr-individ').removeClass('hidden')
+        $('#nutr-table').removeClass('nutr-table-normal')
+        $('#nutr-table').addClass('nutr-table-outline')
+
+        {% autoescape off %}
+        tab_dict = {{ nutr_individ }};
+        {% endautoescape %}
+        
+        $('#nutr-data-energy_tot').text(
+            tab_dict[itemNdbNo].energy_basic.energy_tot
+        );
+        $('#nutr-data-energy_cho').text(
+            tab_dict[itemNdbNo].energy_basic.energy_cho
+        );
+        $('#nutr-data-energy_ptn').text(
+            tab_dict[itemNdbNo].energy_basic.energy_ptn
+        );
+        $('#nutr-data-energy_fat').text(
+            tab_dict[itemNdbNo].energy_basic.energy_fat
+        );
+        $('#nutr-data-mass').text(
+            tab_dict[itemNdbNo].mass
+        );
+        $('#nutr-data-carbs').text(
+            tab_dict[itemNdbNo].nutr_basic_g.carbs
+        );
+        $('#nutr-data-protein').text(
+            tab_dict[itemNdbNo].nutr_basic_g.protein
+        );
+        $('#nutr-data-lipids').text(
+            tab_dict[itemNdbNo].nutr_basic_g.lipids
+        );
+        $('#nutr-data-fiber').text(
+            tab_dict[itemNdbNo].nutr_basic_g.fiber
+        );
+        $('#nutr-data-sugars').text(
+            tab_dict[itemNdbNo].nutr_basic_g.sugars
+        );
+        $('#nutr-data-water').text(
+            tab_dict[itemNdbNo].nutr_basic_g.water
+        );
+        $('#nutr-data-sodium').text(
+            tab_dict[itemNdbNo].nutr_other_mg.sodium
+        );
     });
         
     $('.ingred-list-item').on('mouseout', function() {
         var itemID = this.id;
         $('#' + itemID).removeClass('ingred-list-highlight');
+
+        $('.nutr-cumulative').removeClass('hidden')
+        $('.nutr-individ').addClass('hidden')
+        $('#nutr-table').removeClass('nutr-table-outline')
+        $('#nutr-table').addClass('nutr-table-normal')
+
     });
 
 
@@ -974,8 +1089,8 @@
             );
             $('#servings-change').text('').append(
                 "<a id='servings-save-btn'" +
-                   "class='btn btn-primary'" +
-                   "role='button'>Save Change" +
+                   "class='btn btn-primary servings-btn'" +
+                   "role='button'>Save" +
                 "</a>"
             );
             $('#servings-input-box').focus();

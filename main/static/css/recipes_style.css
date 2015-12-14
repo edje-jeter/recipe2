@@ -28,9 +28,12 @@ h1 {
 }
 
 .crud-btn {
-    width: 150px;
+    width: 105px;
     margin: 3px;
+    padding: 3px;
+    background-color: LightSlateGray;
 }
+
 .attr-edit-input {
     background-color: Pink;
     margin: 3px;
@@ -297,6 +300,7 @@ h1 {
     top: 0px;
     left: 300px;
     width: 200px;
+    height: 300px;
     background-color: White;
 }
 
@@ -309,14 +313,50 @@ h1 {
 }
 
 .ingred-list-highlight {
-    background-color: WhiteSmoke;
+    background-color: SkyBlue;
+}
+
+#servings-label {
+    font-weight: 700;
+}
+
+.servings-btn {
+    width: 60px;
+    height: 20px;
+    margin: 3px;
+    padding: 2px;
+    background-color: LightSlateGray;
+    font-size: 13px;
+    line-height: 1;
+}
+
+#ingred-add-btn {
+    width: 170px;
 }
 
 #nutr-table {
+    width: 200px;
     position: absolute;
-    left: 40px;
+    left: 0px;
     border-collapse: separate;
     border-spacing: 5px 0px;
+}
+
+.nutr-table-normal {
+    border: 3px solid White;
+}
+
+.nutr-table-outline {
+    border: 3px solid SkyBlue;
+}
+
+.nutr-label {
+    text-align: right;
+    font-weight: 700;
+}
+
+.nutr-data-leader {
+    font-weight: 700;
 }
 
 /* ---- End Ingredient and Nutrition Info ------------------------ */
