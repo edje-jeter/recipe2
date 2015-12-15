@@ -73,11 +73,18 @@
 
 /* ---- Key Info Box --------------------------------------------- */
     #key-info-block {
-        border: 0;
-        border-bottom: 3px solid LightSlateGray;
-        /*margin-bottom: 15px;*/
+        /*border-bottom: 3px solid LightSlateGray;*/
         padding-top: 10px;
         padding-bottom: 0px;
+    }
+
+    #key-info-left {
+        border-bottom: 3px solid LightSlateGray;
+    }
+
+    #key-info-right {
+        border-bottom: 3px solid LightSlateGray;
+        max-width: 415px;
     }
 
     .key-info-head {
@@ -100,6 +107,10 @@
     }
 
 /* -- Time ------------------ */
+    #time-info {
+        padding-left: 30px;
+    }
+
     #time-editing {
         width: 350px;
     }
