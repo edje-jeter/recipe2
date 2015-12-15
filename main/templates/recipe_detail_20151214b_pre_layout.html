@@ -5,11 +5,12 @@
 
 {% block body %}
 
-<div id="container-for-main-content" class="container">
+<div class="container">
 
+<div class="row"><!-- for Name Section -->
 <!-- /// #Name ////////////////////////////////////////////////// -->
-    <div id="row-for-name" class="row"><!-- for Name Section -->
-    <div id="name-section" class="col-xs-12">
+    <div id="name-section"
+         class="col-xs-12">
 
         <!-- Default View -->
         <div id="name-editable"
@@ -36,15 +37,16 @@
         </div><!-- /#name-editing -->
 
     </div><!-- /#name-section -->
-    </div><!-- /row for Name Section -->
+</div><!-- /row for Name Section -->
 
+<div class="row"><!-- for Main Column Left and Main Column Right -->
 <!-- /// #Main Column Left ////////////////////////////////////// -->
-    <div id="row-for-MCL-and-MCR" class="row"><!-- for MCL and MCR -->
     <div id="main-column-left" class="col-xs-12 col-md-4">
-    <div id="row-for-inside-MCL" class="row"><!-- inside MCL -->
+    <div class="row"><!-- inside MCL -->
 
-    <!-- ... Image Block ........................................ -->
-        <div id="image-block" class="col-xs-12">
+    <!-- Image Block ............................................ -->
+        <div id="image-block"
+             class="col-xs-12">
             {% if recipe.image %}
                 <img id="image-display"
                      class="col-md-12"
@@ -56,10 +58,12 @@
                      src="{% static 'img/food_default_300px.jpg' %}"
                      alt="Please Upload an Image of the Prepared Recipe">
             {% endif %}
-        </div><!-- /#image-block -->
+        </div><!-- / section Image Block -->
 
-    <!-- ... Meta-Info Block .................................... -->
-        <div id="meta-info-block" class="col-xs-12">
+    <!-- Meta Info Block ........................................ -->
+        <div id="meta-info-block"
+             class="col-xs-12">
+
         <!-- Source -->
             <div id="meta-info-source">
                 <!-- Source Default View -->
@@ -114,149 +118,103 @@
                 <span class="meta-info-data">{{ recipe.tags }}</span>
                 </p>
             </div><!-- /#meta-info-tags -->
-        </div><!-- /#meta-info-block -->
+            
+        </div><!-- / section Meta Info Block -->
 
-    </div><!-- /row for inside MCL -->
+    </div><!-- /inside MCL -->
     </div><!-- /#main-column-left -->
 
 <!-- /// #Main Column Right ///////////////////////////////////// -->
+    <div class="row"><!-- Main Column Right -->
     <div id="main-column-right" class="col-xs-12 col-md-8">
-    <div id="row-for-inside-MCR" class="row"><!-- inside MCR -->
-        
-<!-- ... Key-Info Block ..................................... -->
-        <div id="key-info-block" class="row">
-        <div id="key-info-left" class="col-xs-12 col-sm-6">
-        <div id="row-for-time-energy">
-            
-        <!-- ... Time Info ...................................... -->
-            <div id="time-info" class="col-xs-6">
 
-            <!-- Time Default View -->
-                <div id="time-editable"
-                     class="attribute-editable key-info-col"> 
-                    <span class="key-info-head">Time</span><br>
-                    <span id="time-default-data" class="key-info-data"
-                        ><span id="time-edit-target"
-                        >{{ recipe.time_tot }}</span> mins</span>
-                </div><!-- /#time-editable -->
+        <div class="row"><!-- for key-info-box -->
+        <div id="key-info-box" class="col-xs-12">
 
-            <!-- Time Popup -->
-                <div id="time-popup" class="popup key-popup hidden">
-                    <table class="popup-table">
-                        <tr>
-                            <td align="right"><b>Total Time: </b></td>
-                            <td><b>{{ recipe.time_tot }} mins</b></td></tr>
-                        <tr>
-                            <td align="right">Prep: </td>
-                            <td>{{ recipe.time_prep }} mins</td></tr>
-                        <tr>
-                            <td align="right">Cook: </td>
-                            <td>{{ recipe.time_cook }} mins</td></tr>
-                    </table>
-                </div><!-- /#time-popup -->
+    <!-- Time ............................................... -->
+        <div id="time-info">
+        <!-- Default View -->
+            <div id="time-editable"
+                 class="attribute-editable key-info-col"> 
+                <span class="key-info-head">Time</span><br>
+                <span id="time-default-data"
+                      class="key-info-data"
+                    ><span id="time-edit-target"
+                    >{{ recipe.time_tot }}</span> mins</span>
+            </div><!-- /#time-editable -->
 
-            <!--- Time Edit View -->
-                <div id="time-editing"
-                     class="attribute-editing hidden">
-                    <span id="time-editing-head"
-                          class="key-info-head"
-                        >Prep Time + Cook Time = Total Time (mins):</span>
-                    <div id="time-editing-body">
-                        <input id="time_prep-edit-input"
-                                  class="attr-edit-input time-input"
-                                  maxlength="5"
-                                  value="{{ recipe.time_prep }}"></input> 
-                        <span id="time-edit-plus"
-                              class="time-edit-text"
-                              >+</span>
-                        <input id="time_cook-edit-input"
-                                  class="attr-edit-input time-input"
-                                  maxlength="5"
-                                  value="{{ recipe.time_cook }}"></input>
-                        <span id="time-edit-equals"
-                              class="time-edit-text"
-                              >=</span>
-                        <span id="time_tot-edit-calc"
-                              class="time-edit-text"
-                              >{{ recipe.time_tot }}</span>
-                        <a id='time-save-btn'
-                           class='btn btn-primary attr-save-btn'
-                           role='button'>Save</a>
-                    </div><!-- /#time-editing-body -->
-                </div><!-- /#time-editing -->
+        <!-- Popup -->
+            <div id="time-popup"
+                 class="popup hidden">
+                <table class="popup-table">
+                    <tr>
+                        <td align="right"><b>Total Time: </b></td>
+                        <td><b>{{ energy_basic.energy_tot }} mins</b></td></tr>
+                    <tr>
+                        <td align="right">Prep: </td>
+                        <td>{{ recipe.time_prep }} mins</td></tr>
+                    <tr>
+                        <td align="right">Cook: </td>
+                        <td>{{ recipe.time_cook }} mins</td></tr>
+                </table>
+            </div><!-- /#time-popup -->
 
-            </div><!-- /#time-info -->
-                    
-        <!-- ... Energy Info .................................... -->
-            <div id="energy-info" class="col-xs-6">
-            <!-- Energy Default View -->
-                <div id="energy-editable" class="attribute-editable key-info-col">
-                    <span class="key-info-head">Energy</span><br>
-                    <span id="energy-default-data"
-                          class="key-info-data"
-                        >{{ energy_basic.energy_tot }} Cal</span>
-                </div><!-- /#energy-editable -->
-
-            <!-- Energy Popup -->
-                <div id="energy-popup"
-                     class="popup key-popup hidden">
-                    <table class="popup-table">
-                        <tr><td align="right"
-                            ><b>Total Energy: </b></td>
-                            <td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
-                        <tr><td align="right"
-                            >Carbs: </td>
-                            <td>{{ energy_basic.energy_cho }} Cal</td></tr>
-                        <tr><td align="right"
-                            >Protein: </td>
-                            <td>{{ energy_basic.energy_ptn }} Cal</td></tr>
-                        <tr><td align="right"
-                            >Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
-                    </table>
-                </div><!-- Energy Popup -->
-            </div><!-- /#energy-info -->
-        </div><!-- /.row for time-energy -->
-
-        <!-- ... Description Info ............................... -->
-            <div id="row-for-description">
-            <div id="description-info" class="col-xs-12">
-
-            <!-- Description Default View -->
-                <div id="description-editable"
-                     class="attribute-editable">
-                    <span class="key-info-head"
-                        >Description:</span><br>
-                    <span class="meta-info-data"
-                          id="description-edit-target"
-                        >{{ recipe.description }}</span>
-                </div><!-- /#description-editable -->
-
-            <!-- Description Edit View -->
-                <div id="description-editing"
-                     class="attribute-editing hidden">
-                    <span id="description-edit-head"
-                          class="key-info-head"
-                        >Description (100 character max):</span><br>
-                    <textarea id="description-edit-input"
+        <!--- Edit View -->
+            <div id="time-editing"
+                 class="attribute-editing hidden">
+                <span id="time-editing-head"
+                      class="key-info-head"
+                    >Prep Time + Cook Time = Total Time (mins):</span>
+                <div id="time-editing-body">
+                    <input id="time_prep-edit-input"
                               class="attr-edit-input"
-                              rows="3"
-                              cols="35"
-                              maxlength="100"
-                              >{{ recipe.description }} </textarea> 
-                    <a id='description-save-btn'
+                              maxlength="5"
+                              value="{{ recipe.time_prep }}"></input> 
+                    <span id="time-edit-plus"
+                          class="time-edit-text"
+                          >+</span>
+                    <input id="time_cook-edit-input"
+                              class="attr-edit-input"
+                              maxlength="5"
+                              value="{{ recipe.time_cook }}"></input>
+                    <span id="time-edit-equals"
+                          class="time-edit-text"
+                          >=</span>
+                    <span id="time_tot-edit-calc"
+                          class="time-edit-text"
+                          >{{ recipe.time_tot }}</span>
+                    <a id='time-save-btn'
                        class='btn btn-primary attr-save-btn'
-                       role='button'>Save</a><br>
-                </div><!-- /#description-editing -->
+                       role='button'>Save</a>
+                </div><!-- /#time-editing-body -->
+            </div><!-- /#time-editing -->
 
-            </div><!-- /#description-info -->
-            </div><!-- /.row for description -->
-        </div><!-- /#key-info-left -->
+        </div><!-- /#time-info -->
 
-        <div id="key-info-right" class="col-xs-12 col-sm-3 col-md-4 col-lg-3">
-        <!-- ... Rating Info .................................... -->
-            <div id="rating-info" class="col-xs-12 attribute-editable">
+    <!-- Energy ............................................. -->
+        <!-- Default View -->
+            <div id="energy-info" class="attribute-editable key-info-col">
+                <span class="key-info-head">Energy</span><br>
+                <span id="energy-default-data"
+                      class="key-info-data"
+                    >{{ energy_basic.energy_tot }} Cal</span>
 
-                <div id="stars-tot" class="col-xs-6 col-sm-12">
+        <!-- Popup -->
+                <div id="energy-popup"
+                     class="popup hidden">
+                    <table class="popup-table">
+                        <tr><td align="right"><b>Total Energy: </b></td><td><b>{{ energy_basic.energy_tot }} Cal</b></td></tr>
+                        <tr><td align="right">Carbs: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                        <tr><td align="right">Protein: </td><td>{{ energy_basic.energy_ptn }} Cal</td></tr>
+                        <tr><td align="right">Fat: </td><td>{{ energy_basic.energy_fat }} Cal</td></tr>
+                    </table>
+                </div>
+            </div><!-- /#energy-info -->
+
+    <!-- Rating ............................................. -->
+            <div id="rating-info">
+
+                <div id="stars-tot">
                     <span id="stars-total"></span>
                     <br>
                     <span id="stars-tot-data"
@@ -266,9 +224,9 @@
                             > ratings; avg: </span>
                         <span id="rating-total"
                             >{{ rating_stat_v.avg }}</span></span>
-                </div><!-- /#stars-tot -->
+                </div>
 
-                <div id="stars-use" class="col-xs-6 col-sm-12">
+                <div id="stars-use">
                     <span id="stars-user"></span>
                     <br>
 
@@ -283,36 +241,72 @@
                     {% else %}
                         <a id="rating-remove" href="#">Remove your rating</a>
                     {% endif %}
-                </div><!-- /#stars-use -->
+
+                </div>
             </div><!-- /#rating-info -->
 
-        </div><!-- /#key-info-right -->
-        </div><!-- /#key-info-block -->
+    <!-- Description ........................................ -->
+            <div id="description-info">
 
-<!-- ... Ingredients and Nutr-Info Block .................... -->
-        <div id="ingred-and-nutr-block" class="row">
-        <div id="ingred-list" class="col-xs-6 col-sm-5">
+                <div id="key-info-description">
+                    <!-- Default View -->
+                    <div id="description-editable"
+                         class="attribute-editable">
+                        <span class="key-info-head"
+                            >Description:</span><br>
+                        <span class="meta-info-data"
+                              id="description-edit-target"
+                            >{{ recipe.description }}</span>
+                    </div>
 
+                    <!-- Edit View -->
+                    <div id="description-editing"
+                         class="attribute-editing hidden">
+                        <span id="description-edit-head"
+                              class="key-info-head"
+                            >Description (100 character max):</span><br>
+                        <textarea id="description-edit-input"
+                                  class="attr-edit-input"
+                                  rows="2"
+                                  cols="35"
+                                  maxlength="100"
+                                  >{{ recipe.description }} </textarea> 
+                        <a id='description-save-btn'
+                           class='btn btn-primary attr-save-btn'
+                           role='button'>Save</a><br>
+                    </div>
+
+                </div><!-- /#key-info-description -->
+
+            </div><!-- /#description-info -->
+
+        </div><!-- /#key-info-box -->
+        </div><!-- row for key-info-box [which might get cols later] -->
+
+    <!-- Ingredients ............................................ -->
+        <div id="ingredient-info"
+             class="row">
+            <div id="ingred-box">
         <!-- Ingred List Output 0 ................................... -->
-            <span id="ingred-list-output-0" class="col-xs-12"
-                ><h4>Ingredients</h4>
+                <span id="ingred-list-output-0"
+                    ><h4>Ingredients</h4>
 
-                <span id="servings-label"
-                    >Number of Servings: </span>
-                <span id="servings-display"></span>
-                <span id="servings-change"></span>
+                    <span id="servings-label"
+                        >Number of Servings: </span>
+                    <span id="servings-display"></span>
+                    <span id="servings-change"></span>
 
-                <div class="ingred-list-format">
-                {% for quant in recipe.quantity_set.all %}
-                    <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
-                          class="ingred-list-item"
-                        ><span class="qty-common"
-                        >{{ quant.qty_common }}</span>&nbsp;<span
-                        >{{ quant.ingred.label }} </span><span
-                        >{{ quant.name_common }} </span><br>
-                    </div><!-- ingred-[ndb_no] -->
-                {% endfor %}
-                </div><!-- /.ingred-list-format -->
+                    <div class="ingred-list">
+                    {% for quant in recipe.quantity_set.all %}
+                        <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
+                              class="ingred-list-item"
+                            ><span class="qty-common"
+                            >{{ quant.qty_common }}</span>&nbsp;<span
+                            >{{ quant.ingred.label }} </span><span
+                            >{{ quant.name_common }} </span><br>
+                        </div>
+                    {% endfor %}
+                    </div>
                 
         <!-- Ingred List Output 1 ................................... -->
                 <span id='ingred-list-output-1'></span>
@@ -328,141 +322,145 @@
                 <strong id='ingred-list-output-3'>
                 </strong>
 
-        </div><!-- /#ingred-list -->
+            </div><!-- /#ingred-box -->
 
-        <div id="nutr-list" class="col-xs-6 col-sm-5 col-md-5 col-lg-4">
+            <div id="ingred-nutr-box">
+            <!-- Right Side Head ........................................ -->
+                <h4 id="right-side-head">
+                    Nutrition per Serving
+                </h4>
+                
+            <!-- Right Side Body / Nutr Table ................... -->
+                <span id="right-side-body">
+                <table id="nutr-table"
+                       class="nutr-table-normal">
+                    <tr><td class="nutr-label">Calories: </td>
+                        <td class="nutr-data nutr-data-leader"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_tot }}</span
+                            ><span id="nutr-data-energy_tot"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
 
-        <!-- Right Side Head / Nutr Heading ..................... -->
-            <table id="nutr-table-head">
-                <tr><td class="nutr-table-title"
-                    >Nutrition / Serving</td></tr>
-            </table>
+                    <tr><td class="nutr-label">Carbs: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_cho }}</span
+                            ><span id="nutr-data-energy_cho"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+                    <tr><td class="nutr-label">Protein: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_ptn }}</span
+                            ><span id="nutr-data-energy_ptn"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
+                    <tr><td class="nutr-label">Fat: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ energy_basic.energy_fat }}</span
+                            ><span id="nutr-data-energy_fat"
+                                   class="nutr-individ"
+                                ></span> Cal</td></tr>
 
-        <!-- Right Side Body / Nutr Table ....................... -->
-            <div id="right-side-body">
-            <table id="nutr-table"
-                    class="nutr-table-normal">
-                <tr><td class="nutr-label nutr-label-leader">Calories: </td>
-                    <td class="nutr-data nutr-data-leader"
-                        ><span class="nutr-cumulative"
-                            >{{ energy_basic.energy_tot }}</span
-                        ><span id="nutr-data-energy_tot"
-                               class="nutr-individ"
-                            ></span> Cal</td></tr>
+                    <tr class="blank-row"><td colspan="3"></td></tr>
 
-                <tr><td class="nutr-label">Carbs: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ energy_basic.energy_cho }}</span
-                        ><span id="nutr-data-energy_cho"
-                               class="nutr-individ"
-                            ></span> Cal</td></tr>
-                <tr><td class="nutr-label">Protein: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ energy_basic.energy_ptn }}</span
-                        ><span id="nutr-data-energy_ptn"
-                               class="nutr-individ"
-                            ></span> Cal</td></tr>
-                <tr><td class="nutr-label">Fat: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ energy_basic.energy_fat }}</span
-                        ><span id="nutr-data-energy_fat"
-                               class="nutr-individ"
-                            ></span> Cal</td></tr>
+                    <tr><td class="nutr-label">Mass: </td>
+                        <td class="nutr-data nutr-data-leader"
+                            ><span class="nutr-cumulative"
+                                >{{ mass_basic }}</span
+                            ><span id="nutr-data-mass"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Carbs: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.carbs }}</span
+                            ><span id="nutr-data-carbs"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Protein: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.protein }}</span
+                            ><span id="nutr-data-protein"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Fat: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.lipids }}</span
+                            ><span id="nutr-data-lipids"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Fiber: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.fiber }}</span
+                            ><span id="nutr-data-fiber"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Sugars: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.sugars }}</span
+                            ><span id="nutr-data-sugars"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Water: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_basic.water }}</span
+                            ><span id="nutr-data-water"
+                                   class="nutr-individ"
+                                ></span> g</td></tr>
+                    <tr><td class="nutr-label">Sodium: </td>
+                        <td class="nutr-data"
+                            ><span class="nutr-cumulative"
+                                >{{ nutr_other.sodium }}</span
+                            ><span id="nutr-data-sodium"
+                                   class="nutr-individ"
+                                ></span> mg</td></tr>
+                </table>
+                </span>
+            </div><!-- /#ingred-nutr-box -->
 
-                <tr class="blank-row"><td colspan="3"></td></tr>
+        </div><!-- /#ingredient-info -->
 
-                <tr><td class="nutr-label nutr-label-leader">Mass: </td>
-                    <td class="nutr-data nutr-data-leader"
-                        ><span class="nutr-cumulative"
-                            >{{ mass_basic }}</span
-                        ><span id="nutr-data-mass"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Carbs: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.carbs }}</span
-                        ><span id="nutr-data-carbs"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Protein: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.protein }}</span
-                        ><span id="nutr-data-protein"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Fat: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.lipids }}</span
-                        ><span id="nutr-data-lipids"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Fiber: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.fiber }}</span
-                        ><span id="nutr-data-fiber"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Sugars: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.sugars }}</span
-                        ><span id="nutr-data-sugars"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Water: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_basic.water }}</span
-                        ><span id="nutr-data-water"
-                               class="nutr-individ"
-                            ></span> g</td></tr>
-                <tr><td class="nutr-label">Sodium: </td>
-                    <td class="nutr-data"
-                        ><span class="nutr-cumulative"
-                            >{{ nutr_other.sodium }}</span
-                        ><span id="nutr-data-sodium"
-                               class="nutr-individ"
-                            ></span> mg</td></tr>
-            </table>
-            </div><!-- /#right-side-body -->
-        </div><!-- /#nutr-list -->
-        </div><!-- /#ingred-and-nutr-block -->
+    <!-- /// #Bottom Left Side ///////////////////////////////////// -->
+        <div id="bottom-left-side"
+             class="row">
+        <div class="box">
+        <div class="col-xs-12">
 
-<!-- ... Directions Block ................................... -->
-        <div id="directions-block" class="row">
-        <div id="directions-list" class="col-xs-12 col-md-8">
-
-            <div id="directions-head" class="col-xs-12">
+            <div id="directions-head">
                 <h4
                     >Directions</h4>
-            </div><!-- /#directions-head -->
+            </div>
 
-            <div id="directions-display" class="col-xs-12">
+            <div id="directions-display">
                 {{ recipe.directions }}
                 <br>
-            </div><!-- /#directions-display -->
+            </div>
 
-        </div><!-- /#directions-list -->
-        </div><!-- /#directions-block -->
+        </div>
+        </div>
+        </div><!-- /#bottom-left-side-->
 
-<!-- ... Comments Block ..................................... -->
-        <div id="comments-block" class="row">
-        <div id="comments-list" class="col-xs-12 col-md-8">
+    <!-- /// #Bottom Right Side ///////////////////////////////////// -->
+        <div id="bottom-right-side"
+             class="row">
+        <div class="box">
+        <div class="col-xs-12">
 
         <!-- Comments Display ....................................... -->
-            <div id="comments-head" class="col-xs-12">
+            <div id="comments-head">
                 <h4
-                    >Comments</h4>
-            </div><!-- /#comments-head -->
+                    >Comments:</h4>
+            </div>
 
-            <div id="comments-display" class="col-xs-12">
+            <div id="comments-display">
                 {% for comment in old_comments_v %}
                     {{ comment.number }}. <br>
                     {{ comment.text }}<br>
@@ -473,7 +471,7 @@
             </div><!-- /#comments-display -->
 
         <!-- New Comments ........................................... -->
-            <div id="new-comments" class="col-xs-12">
+            <div id="new-comments">
 
                 {% if active %}
                     {% crispy comments_v %}
@@ -486,30 +484,27 @@
                 {% endif %}
 
             </div><!-- /#new-comments -->
-        </div><!-- /#comments-list -->
-        </div><!-- /#comments-block -->
 
-    </div><!-- /row for inside MCR -->
-    </div><!-- /#main-column-right -->
-    </div><!-- /row for MCL and MCR -->
+        </div>
+        </div>
+        </div><!-- /#bottom-right-side-->
 
-<!-- /// End HTML, Begin JavaScript ///////////////////////////// -->
+    </div></div><!-- /#main-column-right /row -->
 
-<!-- /// Hidden Data, end HTML, etc ///////////////////////////// -->
+</div><!-- /.box -->
+
+</div><!-- /.row for Main Column Left and Main Column Right-->
+</div><!-- /.container -->
+
+<!-- /// Hidden Data //////////////////////////////////////////// -->
     <span id="hidden-servings-orig"
           style="display: none;"
           >{{ recipe.servings_orig }}</span>
 
-    <div class="row">
-        <br><br><hr>
-    </div>
-
-</div><!-- /.container -->
-
 <!-- /// Javascript ///////////////////////////////////////////// -->
-    <script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/jquery.js' %}"></script>
 
-    <script src="{% static 'js/js.cookie.js' %}"></script>
+<script src="{% static 'js/js.cookie.js' %}"></script>
 
 <script type="text/javascript">
 
@@ -517,34 +512,9 @@
     var starGray = "/static/img/star_gray_100px.png ";
     var starMagenta = "/static/img/star_magenta_100px.png ";
 
-    // Time info popup
-    var timeMouseover = function() {
-        $('#time-info').on('mouseover', function() {
-            $('#time-popup').removeClass('hidden');
-            $('#time-editable').addClass('hidden');
-        });
+    // On loading, apply any scaling of the recipe to the ingredient quantities
+    $(function() {
 
-        $('#time-info').on('mouseout', function() {
-            $('#time-popup').addClass('hidden');
-            $('#time-editable').removeClass('hidden');
-        });
-    };
-
-    // Energy info popup
-    var energyMouseover = function() {
-        $('#energy-info').on('mouseover', function() {
-            $('#energy-popup').removeClass('hidden');
-            $('#energy-editable').addClass('hidden');
-        });
-
-        $('#energy-info').on('mouseout', function() {
-            $('#energy-popup').addClass('hidden');
-            $('#energy-editable').removeClass('hidden');
-        });
-    };
-
-    // Check if a serving number is stored in cookie; update servings 
-    var updateServings = function() {
         var servOrig = $('#hidden-servings-orig').text()
         var servModifCookie = Cookies.get("servModifCookie")
 
@@ -565,41 +535,6 @@
             "</a>"
         );
         servingsScale(servTemp);
-    };
-
-    // // Based on updated serving number, calculate and round ingred quants
-    // var updateIngredientQuantities = function(servTemp) {
-    //     var numIngreds = $('.qty-common').length
-    //     for(i = 0; i < numIngreds; i++) {
-    //         qtyComm = Number($('.qty-common')[i].innerText)
-    //         qtyDisplay = qtyComm * servTemp
-            
-    //         // Deal with long floats
-    //         length = qtyDisplay.toString().length
-    //         decimal = qtyDisplay.toString().indexOf('.')
-
-    //         if(length - decimal > 2) {
-    //             temp = qtyDisplay.toFixed(2);
-    //             lastTwo = temp.toString().slice(-2)
-    //             if (lastTwo == '00') {
-    //                 qtyDisplay = qtyDisplay.toFixed(0);
-    //             } else if (lastTwo == '25') {
-    //                 qtyDisplay = qtyDisplay.toFixed(2);
-    //             } else {
-    //                 qtyDisplay = qtyDisplay.toFixed(1);
-    //             };
-    //         };
-
-    //         $('.qty-common')[i].innerText = qtyDisplay
-    //     };
-    // };
-
-    // On loading, apply any scaling of the recipe to the ingredient quantities
-    $(function() {
-
-        updateServings();
-        timeMouseover();
-        energyMouseover();
 
         var numIngreds = $('.qty-common').length
         for(i = 0; i < numIngreds; i++) {
@@ -674,8 +609,33 @@
         ratingMouseOver(ratingSaved);
     });
 
+    // Time info popup
+    $('#time-info').on('mouseover', function() {
+        console.log("time-info mouseover");
+        $('#time-popup').removeClass('hidden');
+        $('#time-default-data').addClass('hidden');
+    });
+
+    $('#time-info').on('mouseout', function() {
+        $('#time-popup').addClass('hidden');
+        $('#time-default-data').removeClass('hidden');
+    });
+
+    // Energy info popup
+    $('#energy-info').on('mouseover', function() {
+        // console.log("energy-info mouseover");
+        $('#energy-popup').removeClass('hidden');
+        $('#energy-default-data').addClass('hidden');
+    });
+
+    $('#energy-info').on('mouseout', function() {
+        $('#energy-popup').addClass('hidden');
+        $('#energy-default-data').removeClass('hidden');
+    });
+
     // Edit an Attribute in the Name or Header ----------------------
     $('#recipe-edit-btn').on('click', function() {
+        console.log("edit btn")
 
         $('.attribute-editable').addClass('hidden');
         $('.attribute-editing').removeClass('hidden');

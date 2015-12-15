@@ -5,381 +5,331 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-body {
-    padding-top: 45px;
-}
 
-h1 {
-    margin-top: 30px;
-    margin-bottom: 20px;
-}
+/* //// Name Section ///////////////////////////////////////////// */
+    #row-for-name {
+        margin-top: 40px;
+    }
 
-.hidden {
-    display: none;
-}
+    h1 {
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
 
-.popup {
-    display: block;
-}
+    #name-editing {
+        height: 65px;
+        width: 600px;
+        position: relative;
+    }
 
-.popup-table {
-    border-collapse: separate;
-    border-spacing: 5px 0px;
-}
+    #name-edit-input {
+        position: absolute;
+        bottom: 5px;
+        margin: 3px;
+    }
 
-.crud-btn {
-    width: 105px;
-    margin: 3px;
-    padding: 3px;
-    background-color: LightSlateGray;
-}
+    #name-save-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 14px;
+    }
+/* ------------------------------- */
 
-.attr-edit-input {
-    background-color: Pink;
-    margin: 3px;
-}
+/* //// Main Column Left Section ///////////////////////////////// */
 
-.attr-save-btn {
-    width: 60px;
-    height: 26px;
-    margin: 3px;
-    padding: 3px;
-    background-color: LightSlateGray;
-}
+/* ---- Image Block ---- */
+    #image-block {
+        margin-bottom: 20px;
+    }
 
-/* --------------------------------- */
-#name-editing {
-    height: 65px;
-    width: 600px;
-    position: relative;
-}
+/* ---- Meta Info Block ---- */
+    .meta-info-spacer {
+        margin-top: 0px;
+    }
 
-#name-edit-input {
-    position: absolute;
-    bottom: 5px;
-    margin: 3px;
-}
+    .meta-info-head {
+        font-size: 100%;
+        font-weight: 700;
+        color: Gray;
+    }
 
-#name-save-btn {
-    position: absolute;
-    bottom: 5px;
-    right: 14px;
+/* -- Source -- */
 
-}
+/* -- Edit and Delete -- */
+    #edit-delete {
+        text-align: center;
+    }
 
-.meta-info-spacer {
-    margin-top: 0px;
-}
+    .crud-btn {
+        width: 130px;
+        margin: 3px;
+        padding: 3px;
+        background-color: LightSlateGray;
+    }
 
-.meta-info-head {
-    font-size: 100%;
-    font-weight: 700;
-    color: Gray;
-}
+/* -- Tags -- */
 
-.blank-row {
-    height: 10px !important; /* Overwrite any previous rules */
-}
+/* //// Main Column Right Section //////////////////////////////// */
 
 /* ---- Key Info Box --------------------------------------------- */
-#key-info-box {
-    position: relative;
-    width: 500px;
-    height: 155px;
-    border: 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
-    /*background-color: #00FFFF;*/
-}
+    #key-info-block {
+        border: 0;
+        border-bottom: 3px solid LightSlateGray;
+        /*margin-bottom: 15px;*/
+        padding-top: 10px;
+        padding-bottom: 0px;
+    }
 
-.key-info-head {
-    font-size: 110%;
-    font-weight: 700;
-    color: Gray;
-}
+    .key-info-head {
+        font-size: 110%;
+        font-weight: 700;
+        color: Gray;
+    }
 
-.key-info-data {
-    font-size: 130%;
-    font-weight: 900;
-    color: Black;
-}
+    .key-info-data {
+        font-size: 130%;
+        font-weight: 900;
+        color: Black;
+    }
 
-/* --- Time ----------------- */
-#time-info {
-    position: absolute;
-    top: 5px;
-    left: 0px;
-    width: 150px;
-    height: 50px;
-    padding-top: 10px;
-    z-index: 10;
-}
+    .key-popup {
+        background-color: White;
+        border-style: solid;
+        border-color: Black;
+        z-index: 10;        
+    }
 
-#time-popup {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background-color: White;
-    border-style: solid;
-    border-color: Black;
-    z-index: 10;
-    width: 156px;
-}
+/* -- Time ------------------ */
+    #time-editing {
+        width: 350px;
+    }
 
-#time-editing {
-    position: absolute;
-    width: 350px;
-    height: 60px;
-}
+    .time-input {
+        width: 40px;
+        margin-left: 20px;
+        margin-right: 20px;
+        text-align: center;
+    }
 
-#time-editing-head {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    color: Black;
-}
+    .time-edit-text {
+        font-size: 110%;
+        font-weight: 700;
+        color: Black;
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
 
-#time-editing-body {
-    position: absolute;
-    top: 20px;
-    left: 0px;
-}
+    #time_tot-edit-calc {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
 
-#time_prep-edit-input {
-    position: absolute;
-    top: 0px;
-    left: 20px;
-    width: 40px;
-    text-align: center;
-}
+/* -- Energy ---------------- */
+    #energy-popup {
+        width: 170px;
+    }
 
-.time-edit-text {
-    font-size: 110%;
-    font-weight: 700;
-    color: Black;
-    margin: 3px;
-}
+/* -- Description ----------- */
+    #description-info {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
 
-#time-edit-plus {
-    position: absolute;
-    top: 0px;
-    left: 80px;
-}
+    #description-editing {
+        width: 500px;
+    }
 
-#time_cook-edit-input {
-    position: absolute;
-    top: 0px;
-    left: 110px;
-    width: 40px;
-    text-align: center;
-}
+    #description-save-btn {
+        margin-left: 15px;
+        margin-bottom: 65px;
+        margin-right: 0px;
+        margin-top: 0px;
+    }
 
-#time-edit-equals {
-    position: absolute;
-    top: 0px;
-    left: 180px;
-}
+/* -- Ratings --------------- */
+    #rating-info {
+        padding-left: 0px;
+        text-align: center;
+    }
 
-#time_tot-edit-calc {
-    position: absolute;
-    top: 0px;
-    left: 215px;
-}
+    #stars-tot, #stars-use {
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
 
-#time-save-btn {
-    position: absolute;
-    top: 0px;
-    left: 271px;
-}
+    .star-crowd, .star-user {
+        width: 25px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
 
-#energy-info {
-    position: absolute;
-    top: 5px;
-    left: 165px;
-    width: 110px;
-    height: 50px;
-    padding-top: 10px;
-}
-
-#energy-popup {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background-color: White;
-    border-style: solid;
-    border-color: Black;
-    z-index: 10;
-    width: 180px;
-}
-
-/* Description -------------- */
-#description-info {
-    position: absolute;
-    top: 140px;
-    left: 0px;
-    max-height: 80px;
-}
-
-#key-info-description {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    width: 350px;
-    padding: 0px;
-}
-
-#description-edit-target {
-    max-height: 20px;
-}
-
-#description-edit-head {
-    position: absolute;
-    bottom: 50px;
-    left: 0px;
-    color: Black;
-}
-
-#description-edit-input {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-}
-
-#description-save-btn {
-    position: absolute;
-    bottom: 11px;
-    left: 271px;
-}
-
-/* Ratings ------------------ */
-#stars-tot {
-    position: absolute;
-    top: 7px;
-    right: 0px;
-    width: 135px;
-    height: 50px;
-    padding: 10px;
-    padding-right: 0px;
-}
-
-#stars-use {
-    position: absolute;
-    top: 77px;
-    right: 0px;
-    width: 135px;
-    height: 50px;
-    padding: 10px;
-    padding-right: 0px;
-}
-
-.star-crowd, .star-user {
-    width: 25px;
-}
-
-#nutr-rating-divider {
-/*    position: absolute;
-    top: 0px;
-*/}
-
-/* ---- End Key Info Box ----------------------------------------- */
 /* ---- Ingredient and Nutrition Info ---------------------------- */
-#ingredient-info {
-    position: relative;
-    width: 500px;
-    z-index: 10;
-}
+    #ingred-and-nutr-block {
+        border-bottom: 3px solid LightSlateGray;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
 
-#ingred-box {
-    position: absolute;
-    width: 300px;
-    background-color: White;
-}
+    #ingred-list, #ingred-list-output-0 {
+        padding-right: 0px;
+    }
 
-#ingred-nutr-box {
-    position: absolute;
-    top: 0px;
-    left: 300px;
-    width: 200px;
-    height: 300px;
-    background-color: White;
-}
+    .ingred-list-format {
+        line-height: 1.9;
+    }
 
-.ingred-list {
-    line-height: 1.9;
-}
+    /*.ingred-list-item {
+        width: 300px;
+    }*/
 
-.ingred-list-item {
-    width: 300px;
-}
+    .ingred-list-highlight {
+        background-color: SkyBlue;
+    }
 
-.ingred-list-highlight {
-    background-color: SkyBlue;
-}
+    #servings-label {
+        font-weight: 700;
+    }
 
-#servings-label {
-    font-weight: 700;
-}
+    #servings-display {
+        font-size: 18px;
+        font-weight: 900;
+    }
 
-.servings-btn {
-    width: 60px;
-    height: 20px;
-    margin: 3px;
-    padding: 2px;
-    background-color: LightSlateGray;
-    font-size: 13px;
-    line-height: 1;
-}
+    .servings-btn {
+        width: 60px;
+        height: 20px;
+        margin: 3px;
+        padding: 2px;
+        background-color: LightSlateGray;
+        font-size: 13px;
+        line-height: 1;
+    }
 
-#ingred-add-btn {
-    width: 170px;
-}
+    #ingred-add-btn {
+        width: 170px;
+    }
 
-#nutr-table {
-    width: 200px;
-    position: absolute;
-    left: 0px;
-    border-collapse: separate;
-    border-spacing: 5px 0px;
-}
+    #nutr-list {
+        padding-left: 0px;
+    }
 
-.nutr-table-normal {
-    border: 3px solid White;
-}
+    #nutr-table {
+        width: 180px;
+        border-collapse: separate;
+        border-spacing: 5px 0px;
+    }
 
-.nutr-table-outline {
-    border: 3px solid SkyBlue;
-}
+    #nutr-table-head {
+        width: 180px;
+        margin-top: 7px;
+    }
 
-.nutr-label {
-    text-align: right;
-    font-weight: 700;
-}
+    .nutr-table-title {
+        font-size: 18px;
+        font-weight: 500;
+        text-align: center;
+    }
 
-.nutr-data-leader {
-    font-weight: 700;
-}
+    .nutr-table-normal {
+        border: 3px solid White;
+    }
 
-/* ---- End Ingredient and Nutrition Info ------------------------ */
+    .nutr-table-outline {
+        border: 3px solid SkyBlue;
+    }
 
- /*! Change .thumb from thumbnail-gallery.css: margin-bottom was 30px */
-.thumb {
-    margin-bottom: 40px;
-}
+    .nutr-label {
+        text-align: right;
+    }
 
-/*! Change .img-responsive from bootstrap.css: add max-height; */
-.img-responsive,
-.thumbnail > img,
-.thumbnail a > img,
-.carousel-inner > .item > img,
-.carousel-inner > .item > a > img {
-  max-height: 250px;
-}
+    .nutr-label-leader {
+        font-weight: 700;
+    }
 
-/*! Change p from bootstrap.css: add white-space; 
-p {
-    white-space: nowrap;
-}*/
+    .nutr-data-leader {
+        font-weight: 700;
+    }
 
-#search_form {
-    margin: 12px;
-}
+/* ---- Directions ----------------------------------------------- */
+    #directions-block {
+        border-bottom: 3px solid LightSlateGray;
+        /*margin-bottom: 15px;*/
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+/* ---- Comments ------------------------------------------------- */
+    #comments-block {
+        /*margin-bottom: 20px;*/
+        border: 0;
+        border-bottom: 3px solid LightSlateGray;
+        margin-bottom: 15px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+/* //// General ////////////////////////////////////////////////// */
+    /* body padding: necessary to keep nav-bar from overlapping content */
+    body {
+        margin-bottom: 40px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .popup {
+        display: block;
+    }
+
+    .popup-table {
+        border-collapse: separate;
+        border-spacing: 5px 0px;
+    }
+
+    .attr-edit-input {
+        background-color: Pink;
+        margin-bottom: 3px;
+        margin-top: 3px;
+    }
+
+    .attr-save-btn {
+        width: 60px;
+        height: 26px;
+        margin: 3px;
+        padding: 3px;
+        background-color: LightSlateGray;
+    }
+
+    .blank-row {
+        height: 10px !important; /* Overwrite any previous rules */
+    }
+
+    /*#bottom-right-side {
+        position: relative;
+    }
+    */
+     /*! Change .thumb from thumbnail-gallery.css: margin-bottom was 30px */
+    .thumb {
+        margin-bottom: 40px;
+    }
+
+    /*! Change .img-responsive from bootstrap.css: add max-height; */
+    .img-responsive,
+    .thumbnail > img,
+    .thumbnail a > img,
+    .carousel-inner > .item > img,
+    .carousel-inner > .item > a > img {
+      max-height: 250px;
+    }
+
+    /*! Change p from bootstrap.css: add white-space; 
+    p {
+        white-space: nowrap;
+    }*/
+    /*
+    #search_form {
+        margin: 12px;
+    }
