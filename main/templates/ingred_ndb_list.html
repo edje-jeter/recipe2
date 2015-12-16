@@ -14,8 +14,7 @@
                 </div>
 
                 <div>
-                    {% for ingred in ingreds %}
-                        Ingredient: 
+                    {% for ingred in ingreds %} 
                         <a href="/ingred_ndb_detail/{{ ingred.pk }}">
                             {{ ingred.ndb_description }}
                         </a>

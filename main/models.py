@@ -13,7 +13,6 @@ class IngredNDB(models.Model):
     # Ingredient USDA Nutrition Database (NDB) number and description
     ndb_no = models.CharField(max_length=255, null=False, blank=False)
     ndb_description = models.CharField(max_length=255, null=False, blank=False)
-    flag = models.BooleanField(blank=True)
 
     def __unicode__(self):
         return self.ndb_description
