@@ -1,5 +1,4 @@
-
-{% load crispy_forms_tags %}
+{% extends 'base.html' %}
 
 {% block body %}
 
@@ -24,11 +23,18 @@
                 </div>
 
                 <div>
-                    <form action="/sign_up/" method="POST">
+{% comment %}                    <form action="/sign_up/" method="POST">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <input type="submit" value="Sign Up!">  
                     </form>
+{% endcomment %}
+
+                    <a id='sign-up-btn'
+                       class='btn btn-primary'
+                       href='/sign_up/'
+                       role='button'>Sign Up!</a>
+
                     <hr>
                 </div>
 

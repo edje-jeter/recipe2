@@ -1,12 +1,33 @@
+{% extends 'base.html' %}
 
-    <form action="/sign_up/" method="POST">
+{% load staticfiles %}
+{% block body %}
 
-        {% csrf_token %}
+    <div class="container">        
+        <div class="row">
+            <div class="box">
 
-        {{ form.as_p }}
+                <div class="col-lg-12">
+                    <hr>
+                    <h1 class="page-header text-center">
+                        <strong>Sign Up</strong>
+                    </h1>
+                </div>
 
-        <input type="submit" value="Sign Up!">  
-    </form>
+                <div>
+                    <form action="/sign_up/" method="POST">
+
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <input type="submit" value="Sign Up!">  
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
     </br></br>
-    {{ valid }}
+
+{% endblock body %}

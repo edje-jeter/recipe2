@@ -617,8 +617,6 @@ def ingred_del_func(request, pk):
     return HttpResponseRedirect('/ingred_list/')
 
 
-
-
 def ingred_del_page(request, pk):
 
     context = {}
@@ -662,7 +660,7 @@ def sign_up(request):
 
                     login(request, auth_user)
 
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect('/recipe_list/')
 
                 else:
                     context['valid'] = "User sign-up failed. Please try again."
@@ -705,7 +703,7 @@ def sign_in(request):
                     login(request, auth_user)
                     context['valid'] = "Sign In Successful"
 
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect('/recipe_list/')
 
             else:
                 context['valid'] = "Sign In Failed: Invalid User"
