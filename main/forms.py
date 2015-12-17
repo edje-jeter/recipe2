@@ -123,16 +123,6 @@ class CommentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
-        # if the destination is recipe_list we get a 405 in terminal and a
-        # blank screen in browser (the address bar shows list but it doesn't load)
-        # self.helper.form_action = '/recipe_list/'
-        # if the dest is detail/ we get a 404 since it needs to go to a specific recipe
-        # self.helper.form_action = '/recipe_detail/'
-        # this gets us a 500: couldn't find the reverse
-        # self.helper.form_action = reverse('rec_det_v')
-        # This doesn't work since the comment hasn't been created yet, so
-        # the instance returns None; but at least the detail page opens
-        # self.helper.form_action = '/recipe_detail/%s/' % self.instance.pk
         self.helper.form_action = ''
 
         self.helper.layout = Layout('text')
@@ -140,6 +130,27 @@ class CommentForm(forms.ModelForm):
             FormActions(
                         Submit('add_comment',
                                'Add Comment',
+                               css_class="btn-primary"
+                               )
+                        )
+        )
+
+
+class UploadImageForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = ['image']
+
+    def __init__(self, *args, **kwargs):
+        super(UploadImageForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_action = ''
+
+        self.helper.layout = Layout('image')
+        self.helper.layout.append(
+            FormActions(
+                        Submit('upload_image',
+                               'Upload Image',
                                css_class="btn-primary"
                                )
                         )

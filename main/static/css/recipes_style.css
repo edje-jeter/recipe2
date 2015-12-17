@@ -42,6 +42,12 @@
         margin-bottom: 20px;
     }
 
+    .image-edit-format {
+        background-color: Pink;
+        text-align: center;
+        padding: 10px;
+    }
+
 /* ---- Meta Info Block ---- */
     .meta-info-spacer {
         margin-top: 0px;
@@ -73,19 +79,14 @@
 
 /* ---- Key Info Box --------------------------------------------- */
     #key-info-block {
-        /*border-bottom: 3px solid LightSlateGray;*/
+        border-bottom: 3px solid LightSlateGray;
         padding-top: 10px;
         padding-bottom: 0px;
     }
 
-    #key-info-left {
-        border-bottom: 3px solid LightSlateGray;
-    }
-
     #key-info-right {
-        border-bottom: 3px solid LightSlateGray;
-        max-width: 415px;
-    }
+        max-width: 400px;
+    }    
 
     .key-info-head {
         font-size: 110%;
@@ -183,16 +184,13 @@
         padding-bottom: 15px;
     }
 
+    /* Ingredient List --------------------- */
     #ingred-list, #ingred-list-output-0 {
         padding-right: 0px;
     }
 
-    .ingred-list-format {
+    /*.ingred-list-format {
         line-height: 1.9;
-    }
-
-    /*.ingred-list-item {
-        width: 300px;
     }*/
 
     .ingred-list-highlight {
@@ -218,10 +216,60 @@
         line-height: 1;
     }
 
-    #ingred-add-btn {
-        width: 170px;
+    .quant-qty_common {
+        display: inline-block;
+        min-width: 10px;
+        margin: 3px;
     }
 
+    .quant-d-ingred-d-label {
+        display: inline-block;
+        width: 50px;
+        margin: 3px;
+    }
+
+    .quant-name_common {
+        display: inline-block;
+        width: 220px;
+        margin: 3px;        
+    }
+
+    .ingred-btn {
+        width: 120px;
+    }
+
+    .ingred-indiv-btn {
+        width: 50px;
+        height: 15px;
+        margin: 3px;
+        padding: 1px;
+        background-color: LightSlateGray;
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    #quant-qty_common-input {
+        width: 40px;
+        margin-left: 0px;
+        margin-right: 5px;
+        text-align: center;
+    }
+
+    #quant-d-ingred-d-label-input {
+        width: 175px;
+        margin-left: 5px;
+        margin-right: 5px;
+        text-align: left;        
+    }
+
+    #quant-name_common-input {
+        width: 230px;
+        margin-left: 0px;
+        margin-right: 5px;
+        text-align: left;        
+    }
+
+    /* Nutrients List ---------- */
     #nutr-list {
         padding-left: 0px;
     }
@@ -266,7 +314,6 @@
 /* ---- Directions ----------------------------------------------- */
     #directions-block {
         border-bottom: 3px solid LightSlateGray;
-        /*margin-bottom: 15px;*/
         padding-top: 15px;
         padding-bottom: 15px;
     }

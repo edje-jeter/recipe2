@@ -69,7 +69,7 @@ class Recipe(models.Model):
     # time_tot = models.TimeField(auto_now=False, auto_now_add=False, default="0:00")
 
     directions = models.TextField(null=False, blank=True)
-    source = models.CharField(max_length=50, null=True, blank=True)
+    source = models.CharField(max_length=250, null=True, blank=True)
     owner = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(upload_to='recipe_img', null=True, blank=True)
 

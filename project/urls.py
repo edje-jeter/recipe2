@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^recipe_detail/(?P<pk>\d+)/$', 'main.views.recipe_detail', name='recipe_detail'),
     url(r'^recipe_attr_edit_func/(?P<pk>\d+)/$', 'main.views.recipe_attr_edit_func', name='recipe_attr_edit_func'),
     url(r'^add_quantity/(?P<pk>\d+)/$', 'main.views.add_quantity', name='add_quantity'),
+    url(r'^del_quantity/$', 'main.views.del_quantity', name='del_quantity'),
+    # url(r'^upload_image/(?P<pk>\d+)/$', 'main.views.upload_image', name='upload_image'),
 
     url(r'^recipe_create/$', 'main.views.recipe_create_func', name='recipe_create'),
     url(r'^recipe_edit/(?P<pk>\d+)/$', 'main.views.recipe_edit', name='recipe_edit'),

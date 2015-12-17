@@ -45,6 +45,8 @@
 
     <!-- ... Image Block ........................................ -->
         <div id="image-block" class="col-xs-12">
+
+            <div id="image-editable">
             {% if recipe.image %}
                 <img id="image-display"
                      class="col-md-12"
@@ -56,6 +58,13 @@
                      src="{% static 'img/food_default_300px.jpg' %}"
                      alt="Please Upload an Image of the Prepared Recipe">
             {% endif %}
+            </div><!-- /#image-editable -->
+
+            <div id="image-editing"
+                 class="attribute-editing hidden">
+                {% crispy upload_image_form %}
+            </div><!-- /#image-editing -->
+
         </div><!-- /#image-block -->
 
     <!-- ... Meta-Info Block .................................... -->
@@ -70,7 +79,7 @@
                             >Source:</span><br>
                         <span id="source-edit-target"
                               class="meta-info-data"
-                            >{{ recipe.author }}</span>
+                            >{{ recipe.source }}</span>
                     </p>
                 </div><!-- /#source-editable -->
 
@@ -84,7 +93,7 @@
                               class="attr-edit-input"
                               rows="3"
                               cols="35"
-                              maxlength="50"
+                              maxlength="250"
                               >{{ recipe.source }} </textarea> 
                     <a id='source-save-btn'
                        class='btn btn-primary attr-save-btn'
@@ -99,6 +108,10 @@
                 <a id="recipe-edit-btn"
                    class="btn btn-primary crud-btn"
                    role="button">Edit Recipe</a>
+
+                <a id="recipe-stop-edit-btn"
+                   class="btn btn-primary crud-btn hidden"
+                   role="button">Stop Editing</a>
 
                 <a id="recipe-delete-btn"
                    class="btn btn-primary crud-btn"
@@ -132,6 +145,7 @@
             <div id="time-info" class="col-xs-6">
 
             <!-- Time Default View -->
+                <div id="time-mouseover-target">
                 <div id="time-editable"
                      class="attribute-editable key-info-col"> 
                     <span class="key-info-head">Time</span><br>
@@ -154,6 +168,7 @@
                             <td>{{ recipe.time_cook }} mins</td></tr>
                     </table>
                 </div><!-- /#time-popup -->
+                </div><!-- /#time-mouseover-target -->
 
             <!--- Time Edit View -->
                 <div id="time-editing"
@@ -291,7 +306,7 @@
 
 <!-- ... Ingredients and Nutr-Info Block .................... -->
         <div id="ingred-and-nutr-block" class="row">
-        <div id="ingred-list" class="col-xs-6 col-sm-5">
+        <div id="ingred-list" class="col-xs-6 col-sm-6">
 
         <!-- Ingred List Output 0 ................................... -->
             <span id="ingred-list-output-0" class="col-xs-12"
@@ -302,18 +317,56 @@
                 <span id="servings-display"></span>
                 <span id="servings-change"></span>
 
-                <div class="ingred-list-format">
+            <!-- Ingreds Default View -->
+                <div id="ingred-editable"
+                     class="quant-editable ingred-list-format">
                 {% for quant in recipe.quantity_set.all %}
                     <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
-                          class="ingred-list-item"
-                        ><span class="qty-common"
-                        >{{ quant.qty_common }}</span>&nbsp;<span
-                        >{{ quant.ingred.label }} </span><span
-                        >{{ quant.name_common }} </span><br>
+                          class="ingred-list-item">
+                        <span class="quant-qty_common"
+                            >{{ quant.qty_common }}</span>
+                        <span class="quant-d-ingred-d-label"
+                            >{{ quant.ingred.label }}</span>
+                        <span class="quant-name_common"
+                            >{{ quant.name_common }}</span>
+                        <span id="ingred-{{ quant.ingred.ndb_id.ndb_no }}-btns"
+                              class="ingred-btn-holder hidden"
+                            ><a id='ingred-edit-btn-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}'
+                                class='btn btn-primary ingred-indiv-btn'
+                                role='button'>Change</a></span><br>
+
                     </div><!-- ingred-[ndb_no] -->
                 {% endfor %}
-                </div><!-- /.ingred-list-format -->
-                
+                </div><!-- /#ingred-editable -->
+
+            <!-- Ingreds Editing View -->
+                <div id="ingred-editing"
+                     class="quant-editing ingred-list-format hidden">
+                {% for quant in recipe.quantity_set.all %}
+                    <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
+                          class="ingred-list-item">
+
+                        <input id="qty_common-edit-input"
+                                  class="attr-edit-input ingred-input"
+                                  maxlength="5"
+                                  value="{{ quant.qty_common }}"></input>
+                        <input id="quant-ingred-label-edit-input"
+                                  class="attr-edit-input ingred-input"
+                                  maxlength="20"
+                                  value="{{ quant.ingred.label }}"></input>
+                        <br>
+                        <input id="name_common-edit-input"
+                                  class="attr-edit-input ingred-input"
+                                  maxlength="50"
+                                  value="{{ quant.name_common }}"></input>
+                        <a id='ingred-save-btn'
+                           class='btn btn-primary attr-save-btn'
+                           role='button'>Save</a>
+
+                    </div><!-- ingred-[ndb_no] -->
+                {% endfor %}
+                </div><!-- /#ingred-editing -->
+
         <!-- Ingred List Output 1 ................................... -->
                 <span id='ingred-list-output-1'></span>
                 <br>
@@ -321,8 +374,16 @@
         <!-- Ingred List Output 2 ................................... -->
                 <span id='ingred-list-output-2'
                     ><a id='ingred-add-btn'
-                       class='btn btn-primary servings-btn'
-                       role='button'>Add Another Ingredient</a></span><br>
+                       class='btn btn-primary servings-btn ingred-btn'
+                       role='button'>Add Ingredient</a>
+
+                    <a id='ingred-edit-activate-btn'
+                       class='btn btn-primary servings-btn ingred-btn'
+                       role='button'>Edit Ingredients</a>
+
+                    <a id='ingred-edit-deactivate-btn'
+                       class='btn btn-primary servings-btn ingred-btn hidden'
+                       role='button'>Stop Editing</a></span><br>
 
         <!-- Ingred List Output 3 ................................... -->
                 <strong id='ingred-list-output-3'>
@@ -444,10 +505,29 @@
                     >Directions</h4>
             </div><!-- /#directions-head -->
 
-            <div id="directions-display" class="col-xs-12">
-                {{ recipe.directions }}
+            <!-- Directions Default View -->
+            <div id="directions-editable"
+                 class="col-xs-12 attribute-editable">
+                <span id="directions-edit-target"
+                    >{{ recipe.directions|linebreaks }}</span>
                 <br>
-            </div><!-- /#directions-display -->
+            </div><!-- /#directions-editable -->
+
+            <!-- Directions Editing -->
+            <div id="directions-editing"
+                 class="attribute-editing hidden">
+                    <span id="directions-edit-head"
+                          class="meta-info-head"
+                        >Directions (Press "enter" twice between steps):</span><br>
+                    <textarea id="directions-edit-input"
+                              class="attr-edit-input"
+                              rows="15"
+                              cols="80"
+                              >{{ recipe.directions }} </textarea>
+                    <a id='directions-save-btn'
+                       class='btn btn-primary attr-save-btn'
+                       role='button'>Save</a><br>
+            </div><!-- Directions-editing -->
 
         </div><!-- /#directions-list -->
         </div><!-- /#directions-block -->
@@ -513,21 +593,123 @@
 
 <script type="text/javascript">
 
+    // Edit individual ingredients
+    $('.ingred-indiv-btn').on('click', function() {
+        var itemID = this.id;
+        console.log("itemID: " + itemID);
+
+        var idNums = itemID.replace('ingred-edit-btn-', '');
+        console.log(idNums);
+
+        var quantityPK = idNums.split(/[-]/)[0];
+        console.log(quantityPK);
+        var itemNdbNo = idNums.split(/[-]/)[1];
+        console.log(itemNdbNo);
+
+        var qty_common = $('#ingred-' + itemNdbNo).
+            find(' .quant-qty_common').text();
+        var label = $('#ingred-' + itemNdbNo).
+            find(' .quant-d-ingred-d-label').text();
+        var name_common = $('#ingred-' + itemNdbNo).
+            find(' .quant-name_common').text();
+
+        $('#ingred-' + itemNdbNo).text('').append(
+            '<input id="quant-qty_common-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="5"' +
+                      'type="text"' +
+                      'value=' + qty_common + '></input>' +
+            '<input id="quant-d-ingred-d-label-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="20"' +
+                      'type="text"' +
+                      'value="' + label + '""></input>' +
+            '<br>' +
+            '<input id="quant-name_common-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="50"' +
+                      'type="text"' +
+                      'value="' + name_common + '"></input>' +
+            '<a id="ingred-save-btn"' +
+               'class="btn btn-primary ingred-indiv-btn"' +
+               'role="button">Save</a>' +
+            '<a id="ingred-delete-btn-' + quantityPK + '"' +
+               'class="btn btn-primary ingred-indiv-btn ingred-del-btn"' +
+               'role="button">Delete</a>'
+        );
+        preDeleteIndividualIngredients(quantityPK, itemNdbNo, name_common);
+    });
+
+    // Confirmation before deleting individual ingredient
+    var preDeleteIndividualIngredients = function(quantityPK, itemNdbNo, name_common) {
+        $('#ingred-delete-btn-' + quantityPK).on('click', function() {
+            $('#ingred-' + itemNdbNo).text('').append(
+                'Are you sure you want to delete ' +
+                name_common +
+                '? ' +
+                '<a id="ingred-del-conf-btn-' + quantityPK + '"' +
+                   'class="btn btn-primary ingred-indiv-btn ingred-del-conf-btn"' +
+                   'role="button">Delete</a>'
+            );
+            deleteIndividualIngredients(quantityPK, itemNdbNo);
+        });
+    };
+
+    // Delete Individual Ingredients
+    var deleteIndividualIngredients = function(quantityPK, itemNdbNo) {
+        $('.ingred-del-conf-btn').on('click', function() {
+            console.log("ingred-del-conf-btn");
+            console.log(quantityPK);
+
+            $.ajax({
+                type: 'GET',
+                url: '/del_quantity/',
+                data: { quantity_pk: quantityPK },
+                error: function() {},
+                success: function() {
+                    console.log("del quantity success")
+                    $('#ingred-' + itemNdbNo).text('')
+                }
+
+            });
+        });
+    };
+
+    // Toggle display of buttons to edit individual ingredients
+    var activateEditIngredients = function() {
+        $('#ingred-edit-activate-btn').on('click', function() {
+            $('.ingred-btn-holder').removeClass('hidden');
+            $('#ingred-edit-activate-btn').addClass('hidden');
+            $('#ingred-edit-deactivate-btn').removeClass('hidden');
+        });
+
+        $('#ingred-edit-deactivate-btn').on('click', function() {
+            $('.ingred-btn-holder').addClass('hidden');
+            $('#ingred-edit-activate-btn').removeClass('hidden');
+            $('#ingred-edit-deactivate-btn').addClass('hidden');
+        });
+    };
+
     // Set the source of the rating-star images
-    var starGray = "/static/img/star_gray_100px.png ";
-    var starMagenta = "/static/img/star_magenta_100px.png ";
+        var starGray = "/static/img/star_gray_100px.png ";
+        var starMagenta = "/static/img/star_magenta_100px.png ";
 
     // Time info popup
     var timeMouseover = function() {
-        $('#time-info').on('mouseover', function() {
+        $('#time-mouseover-target').on('mouseover', function() {
             $('#time-popup').removeClass('hidden');
             $('#time-editable').addClass('hidden');
         });
 
-        $('#time-info').on('mouseout', function() {
+        $('#time-mouseover-target').on('mouseout', function() {
             $('#time-popup').addClass('hidden');
             $('#time-editable').removeClass('hidden');
         });
+    };
+
+    // Deactivate Time Info Popup during editing
+    var timeMouseoverDeactivate = function() {
+        $('#time-info').on('mouseover', function() {});
     };
 
     // Energy info popup
@@ -567,43 +749,17 @@
         servingsScale(servTemp);
     };
 
-    // // Based on updated serving number, calculate and round ingred quants
-    // var updateIngredientQuantities = function(servTemp) {
-    //     var numIngreds = $('.qty-common').length
-    //     for(i = 0; i < numIngreds; i++) {
-    //         qtyComm = Number($('.qty-common')[i].innerText)
-    //         qtyDisplay = qtyComm * servTemp
-            
-    //         // Deal with long floats
-    //         length = qtyDisplay.toString().length
-    //         decimal = qtyDisplay.toString().indexOf('.')
-
-    //         if(length - decimal > 2) {
-    //             temp = qtyDisplay.toFixed(2);
-    //             lastTwo = temp.toString().slice(-2)
-    //             if (lastTwo == '00') {
-    //                 qtyDisplay = qtyDisplay.toFixed(0);
-    //             } else if (lastTwo == '25') {
-    //                 qtyDisplay = qtyDisplay.toFixed(2);
-    //             } else {
-    //                 qtyDisplay = qtyDisplay.toFixed(1);
-    //             };
-    //         };
-
-    //         $('.qty-common')[i].innerText = qtyDisplay
-    //     };
-    // };
-
     // On loading, apply any scaling of the recipe to the ingredient quantities
     $(function() {
 
         updateServings();
         timeMouseover();
         energyMouseover();
+        activateEditIngredients();
 
-        var numIngreds = $('.qty-common').length
+        var numIngreds = $('.quant-qty_common').length
         for(i = 0; i < numIngreds; i++) {
-            qtyComm = Number($('.qty-common')[i].innerText)
+            qtyComm = Number($('.quant-qty_common')[i].innerText)
             qtyDisplay = qtyComm * servTemp
             
             // Deal with long floats
@@ -622,7 +778,7 @@
                 };
             };
 
-            $('.qty-common')[i].innerText = qtyDisplay
+            $('.quant-qty_common')[i].innerText = qtyDisplay
         };
 
         // Rating of Recipes
@@ -672,27 +828,6 @@
                  "src=" + starSourceU[4] + ">"
         );
         ratingMouseOver(ratingSaved);
-    });
-
-    // Edit an Attribute in the Name or Header ----------------------
-    $('#recipe-edit-btn').on('click', function() {
-
-        $('.attribute-editable').addClass('hidden');
-        $('.attribute-editing').removeClass('hidden');
-        $('#name-edit-input').focus();
-
-        $('#time_prep-edit-input').on('keyup', function() {
-            timeTotCalc();
-        });
-        $('#time_cook-edit-input').on('keyup', function() {
-            timeTotCalc();
-        });
-
-        var timeTotCalc = function() {
-            timePrep = Number($('#time_prep-edit-input').val());
-            timeCook = Number($('#time_cook-edit-input').val());
-            $('#time_tot-edit-calc').text(timePrep + timeCook);
-        };
     });
 
     // Click on item in ingredient list; get ndb_no
@@ -764,16 +899,51 @@
 
     });
 
+    // Edit an Attribute in the Name or Header ----------------------
+    $('#recipe-edit-btn').on('click', function() {
+
+        $('.attribute-editable').addClass('hidden');
+        $('.attribute-editing').removeClass('hidden');
+        $('#name-edit-input').focus();
+
+        $('#image-block').addClass('image-edit-format');
+        $('#recipe-stop-edit-btn').removeClass('hidden');
+        $('#recipe-edit-btn').addClass('hidden');
+
+        $('#time_prep-edit-input').on('keyup', function() {
+            timeTotCalc();
+        });
+        $('#time_cook-edit-input').on('keyup', function() {
+            timeTotCalc();
+        });
+
+        var timeTotCalc = function() {
+            timePrep = Number($('#time_prep-edit-input').val());
+            timeCook = Number($('#time_cook-edit-input').val());
+            $('#time_tot-edit-calc').text(timePrep + timeCook);
+        };
+
+        $('#time-save-btn').on('click', function() {
+            $('#rating-info').removeClass('hidden');
+        });
+    });
+
+    // Click "Stop Editing" button to restore default views
+    $('#recipe-stop-edit-btn').on('click', function() {
+        $('.attribute-editable').removeClass('hidden');
+        $('.attribute-editing').addClass('hidden');
+
+        $('#image-block').removeClass('image-edit-format');
+        $('#recipe-stop-edit-btn').addClass('hidden');
+        $('#recipe-edit-btn').removeClass('hidden');
+        $('#rating-info').removeClass('hidden');
+    });
 
     // Click on the "Save" button for an edited attribute
     // Get the name of the attribute
     $('.attr-save-btn').on('click', function() {
-        console.log("attr-save-btn clicked");
-        
         var attribute = this.id.split(/[-]/)[0];
-        console.log(attribute)
 
-        // Handle the Time attributes
         if(attribute == "time") {
             timeValue(attribute);
         } else {
@@ -784,9 +954,7 @@
     // Read edited attribute input values for a given attribute
     var attrValue = function(attribute) {
         var inputID = '#' + attribute + '-edit-input';
-        console.log(inputID);
         var newValue = $(inputID).val();
-        console.log(newValue);
         var pAttr = attribute;
 
         attrSave(pAttr, attribute, newValue)
@@ -808,7 +976,6 @@
     // Accept and save edited value for given attribute; pAttr
     // (parent attribute) deals with multi-value cases like "time"
     var attrSave = function(pAttr, attribute, newValue) {
-        console.log("attrSave func initiated");
 
         $.ajax({
             type: 'GET',
@@ -818,11 +985,9 @@
                    },
             error: function() {},
             success: function() {
-                console.log("attrSave func executed");
-
                 $('#' + pAttr + '-editable').removeClass('hidden');
                 $('#' + pAttr + '-editing').addClass('hidden');
-                $('#' + pAttr + '-edit-target').text(newValue);
+                $('#' + pAttr + '-edit-target').text(newValue|linebreaks);
             }
         });
     };
@@ -1058,40 +1223,6 @@
         });
     };
 
-    // Display input box to edit name of recipe
-    $('#name-edit-btn').on('click', function() {
-        $('#name-display').text('').append(
-                "<h4>Edit the Recipe Name:</h4>" +
-                "<input id='name-append-input-box'" +
-                       "type='text'" +
-                       "value='{{ recipe.name }}'>" +
-                "</input> " +
-                "<a id='name-save-btn'" +
-                   "class='btn btn-primary'" +
-                   "role='button'>Save Changes to Recipe Name" +
-                "</a><br>"
-            );
-        $('#name-append-input-box').focus();
-        nameSave();
-    });
-
-    // Accept and save edited name of recipe
-    var nameSave = function() {
-        $('#name-save-btn').on('click', function() {
-            $.ajax({
-                type: 'GET',
-                url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
-                data: { attr: 'name',
-                        new_value: $('#name-append-input-box').val(),
-                       },
-                error: function() {},
-                success: function() {
-                    location.reload(true);
-                }
-            });
-        });
-    };
-
     var servingsScale = function(servTemp) {
         $('#servings-scale-btn').on('click', function() {
             $('#servings-display').text('').append(
@@ -1113,7 +1244,7 @@
         });
     };
     
-    // Accept and save edited name of recipe
+    // Accept and save servings ...
     var servingsSave = function() {
         $('#servings-save-btn').on('click', function() {
             

@@ -16,6 +16,7 @@ from main.forms import RecipeAddForm, RecipeEditForm
 from main.forms import IngredAddForm
 from main.forms import UserSignUp, UserSignIn
 from main.forms import CommentForm
+from main.forms import UploadImageForm
 
 from main.models import IngredNDB, IngredNutr, Recipe, Quantity
 from main.models import Comment, Vote, VoteStat, Rating, RatingStat
@@ -281,6 +282,14 @@ def add_quantity(request, pk):
     return HttpResponse(status=200)
 
 
+def del_quantity(request):
+
+    quantity_pk = request.GET.get('quantity_pk', '')
+    Quantity.objects.get(pk=quantity_pk).delete()
+
+    return HttpResponse(status=200)
+
+
 # ---- Recipe List --------------------------------------------------
 def RecipeListView(request):
     context = {}
@@ -481,7 +490,6 @@ def recipe_detail(request, pk):
 
     context['nutr_individ'] = json.dumps(sca[4])
 
-    # print  "%s" % json.dumps(sca[4])
     context['text_dict'] = json.dumps(sca[4])
 
     context['active'] = active
@@ -491,6 +499,20 @@ def recipe_detail(request, pk):
 
     context['old_comments_v'] = old_comments
     context['comments_v'] = cntxt_comments_v
+
+    context['upload_image_form'] = UploadImageForm(initial={'id': pk})
+    if request.method == 'POST':
+
+        form = UploadImageForm(request.POST or None,
+                               request.FILES or None,
+                               instance=recipe
+                               )
+        if form.is_valid():
+            print "form is valid"
+            form.save()
+            return HttpResponseRedirect('/recipe_detail/%s' % pk)
+    else:
+        form = UploadImageForm()
 
     # Send data to template -----------------------------------------
     return render_to_response('recipe_detail.html', context,
@@ -556,6 +578,18 @@ def recipe_delete_page(request, pk):
                               context_instance=RequestContext(request))
 
 
+# def upload_image(request, pk):
+#     if request.method == 'POST':
+#         form = UploadImageForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return HttpResponse(status=200)
+#     else:
+#         form = UploadImageForm()
+
+#     return render(request, 'upload.html', {'form': form})
+
+
 # ---- Add and Delete Ingredients (models.py Ingredient) ------------
 def ingred_add(request):
 
@@ -581,6 +615,8 @@ def ingred_del_func(request, pk):
     IngredNutr.objects.get(pk=pk).delete()
 
     return HttpResponseRedirect('/ingred_list/')
+
+
 
 
 def ingred_del_page(request, pk):
@@ -727,7 +763,6 @@ def rating_func(request, pk):
 
     rating_cur.save()
 
-    # return HttpResponse(status=200)
     return HttpResponseRedirect('/rating_stats_func/%s' % pk)
 
 
