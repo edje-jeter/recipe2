@@ -2,3 +2,4 @@
 media/
 .DS_Store
 main/migrations/
+settings_server.py
