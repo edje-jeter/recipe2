@@ -271,37 +271,62 @@
         <!-- ... Rating Info .................................... -->
             <div id="rating-info" class="col-xs-12 attribute-editable">
 
+            <!-- Stars Crowd Total -->
                 <div id="stars-tot" class="col-xs-6 col-sm-12">
-                    <span id="stars-total"></span>
+                    <span id="stars-total"
+                        >{% for i in '12345' %}<img
+                            class='star-crowd' id='star-c-{{ i }}'
+                            >{% endfor %}</span>
                     <br>
                     <span id="stars-tot-data"
                         ><span id="raters-total"
-                            >{{ rating_stat_v.count }}</span>
+                            >{{ rs_count }}</span>
                         <span id="stars-tot-labels"
                             > ratings; avg: </span>
                         <span id="rating-total"
-                            >{{ rating_stat_v.avg }}</span></span>
+                            >{{ rs_avg }}</span></span>
                 </div><!-- /#stars-tot -->
 
+            <!-- Stars Individual User -->
                 <div id="stars-use" class="col-xs-6 col-sm-12">
-                    <span id="stars-user"></span>
+                    <span id="stars-user"
+                    >{% for i in '12345' %}<img
+                        class='star-user' id='star-u-{{ i }}'
+                        >{% endfor %}</span>
                     <br>
 
                     <span id="hidden-rating-saved"
                           style="display: none;"
-                    >{{ rating_v.rating }}</span>
+                    >{{ rating_v }}</span>
 
-                    {% if rating_v.rating == -1 %}
-                        Sign-in to rate
-                    {% elif rating_v.rating == 0 %}
-                        Add your rating
-                    {% else %}
-                        <a id="rating-remove" href="#">Remove your rating</a>
-                    {% endif %}
+                    <span id="rating-status"></span>
+
                 </div><!-- /#stars-use -->
             </div><!-- /#rating-info -->
 
         </div><!-- /#key-info-right -->
+
+        <!-- ... Rating Distribution Info ....................... -->
+            <div id="key-info-right-margin" class="col-sm-3 col-md-2 col-lg-3">
+
+                <div id="row-for-rs-distrib" class="row">
+                <div id="rs-distrib" class="hidden">
+
+                    {% for dis, vals in rs_distrib.items %}
+                        <div class="rs-bar-holder">
+                            <span class="rs-label">{{ dis }}</span>
+                            <div class="rs-bar-outline">
+                                <div class="rs-bar"
+                                     style="width: {{ vals.prcnt }}%"
+                                     >&nbsp;</div></div>
+                            <span class="rs-percent"
+                                >{{ vals.prcnt }}%</span><br>
+                        </div>
+                    {% endfor %}
+                </div><!-- /#rs-distrib -->
+                </div><!-- /#row-for-rs-distrib -->
+            </div><!-- /#key-info-right-margin -->
+
         </div><!-- /#key-info-block -->
 
 <!-- ... Ingredients and Nutr-Info Block .................... -->
@@ -321,19 +346,24 @@
                 <div id="ingred-editable"
                      class="quant-editable ingred-list-format">
                 {% for quant in recipe.quantity_set.all %}
-                    <div id="ingred-{{ quant.ingred.ndb_id.ndb_no }}"
+                    <div id="ingred-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}"
                           class="ingred-list-item">
-                        <span class="quant-qty_common"
+                    <span id="ingred-orig-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}"
+                       ><span class="quant-qty_common"
                             >{{ quant.qty_common }}</span>
                         <span class="quant-d-ingred-d-label"
                             >{{ quant.ingred.label }}</span>
                         <span class="quant-name_common"
                             >{{ quant.name_common }}</span>
-                        <span id="ingred-{{ quant.ingred.ndb_id.ndb_no }}-btns"
-                              class="ingred-btn-holder hidden"
+                        <span id="ingred-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}-btns"
+                              class='ingred-btn-holder'
                             ><a id='ingred-edit-btn-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}'
-                                class='btn btn-primary ingred-indiv-btn'
-                                role='button'>Change</a></span><br>
+                                class='btn btn-primary ingred-indiv-btn hidden'
+                                role='button'>Change</a><a
+                                id='ingred-cancel-btn-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}'
+                                class='btn btn-primary ingred-indiv-btn hidden'
+                                role='button'>Cancel</a></span></span><br>
+                    <span id='ingred-edit-append-{{ quant.id }}-{{ quant.ingred.ndb_id.ndb_no }}'></span>
 
                     </div><!-- ingred-[ndb_no] -->
                 {% endfor %}
@@ -375,15 +405,7 @@
                 <span id='ingred-list-output-2'
                     ><a id='ingred-add-btn'
                        class='btn btn-primary servings-btn ingred-btn'
-                       role='button'>Add Ingredient</a>
-
-                    <a id='ingred-edit-activate-btn'
-                       class='btn btn-primary servings-btn ingred-btn'
-                       role='button'>Edit Ingredients</a>
-
-                    <a id='ingred-edit-deactivate-btn'
-                       class='btn btn-primary servings-btn ingred-btn hidden'
-                       role='button'>Stop Editing</a></span><br>
+                       role='button'>Add Ingredient</a></span><br>
 
         <!-- Ingred List Output 3 ................................... -->
                 <strong id='ingred-list-output-3'>
@@ -593,109 +615,9 @@
 
 <script type="text/javascript">
 
-    // Edit individual ingredients
-    $('.ingred-indiv-btn').on('click', function() {
-        var itemID = this.id;
-        console.log("itemID: " + itemID);
-
-        var idNums = itemID.replace('ingred-edit-btn-', '');
-        console.log(idNums);
-
-        var quantityPK = idNums.split(/[-]/)[0];
-        console.log(quantityPK);
-        var itemNdbNo = idNums.split(/[-]/)[1];
-        console.log(itemNdbNo);
-
-        var qty_common = $('#ingred-' + itemNdbNo).
-            find(' .quant-qty_common').text();
-        var label = $('#ingred-' + itemNdbNo).
-            find(' .quant-d-ingred-d-label').text();
-        var name_common = $('#ingred-' + itemNdbNo).
-            find(' .quant-name_common').text();
-
-        $('#ingred-' + itemNdbNo).text('').append(
-            '<input id="quant-qty_common-input"' +
-                      'class="attr-edit-input ingred-input"' +
-                      'maxlength="5"' +
-                      'type="text"' +
-                      'value=' + qty_common + '></input>' +
-            '<input id="quant-d-ingred-d-label-input"' +
-                      'class="attr-edit-input ingred-input"' +
-                      'maxlength="20"' +
-                      'type="text"' +
-                      'value="' + label + '""></input>' +
-            '<br>' +
-            '<input id="quant-name_common-input"' +
-                      'class="attr-edit-input ingred-input"' +
-                      'maxlength="50"' +
-                      'type="text"' +
-                      'value="' + name_common + '"></input>' +
-            '<a id="ingred-save-btn"' +
-               'class="btn btn-primary ingred-indiv-btn"' +
-               'role="button">Save</a>' +
-            '<a id="ingred-delete-btn-' + quantityPK + '"' +
-               'class="btn btn-primary ingred-indiv-btn ingred-del-btn"' +
-               'role="button">Delete</a>'
-        );
-        preDeleteIndividualIngredients(quantityPK, itemNdbNo, name_common);
-    });
-
-    // Confirmation before deleting individual ingredient
-    var preDeleteIndividualIngredients = function(quantityPK, itemNdbNo, name_common) {
-        $('#ingred-delete-btn-' + quantityPK).on('click', function() {
-            $('#ingred-' + itemNdbNo).text('').append(
-                'Are you sure you want to delete ' +
-                name_common +
-                '? ' +
-                '<a id="ingred-del-conf-btn-' + quantityPK + '"' +
-                   'class="btn btn-primary ingred-indiv-btn ingred-del-conf-btn"' +
-                   'role="button">Delete</a>'
-            );
-            deleteIndividualIngredients(quantityPK, itemNdbNo);
-        });
-    };
-
-    // Delete Individual Ingredients
-    var deleteIndividualIngredients = function(quantityPK, itemNdbNo) {
-        $('.ingred-del-conf-btn').on('click', function() {
-            console.log("ingred-del-conf-btn");
-            console.log(quantityPK);
-
-            $.ajax({
-                type: 'GET',
-                url: '/del_quantity/',
-                data: { quantity_pk: quantityPK },
-                error: function() {},
-                success: function() {
-                    console.log("del quantity success")
-                    $('#ingred-' + itemNdbNo).text('')
-                }
-
-            });
-        });
-    };
-
-    // Toggle display of buttons to edit individual ingredients
-    var activateEditIngredients = function() {
-        $('#ingred-edit-activate-btn').on('click', function() {
-            $('.ingred-btn-holder').removeClass('hidden');
-            $('#ingred-edit-activate-btn').addClass('hidden');
-            $('#ingred-edit-deactivate-btn').removeClass('hidden');
-        });
-
-        $('#ingred-edit-deactivate-btn').on('click', function() {
-            $('.ingred-btn-holder').addClass('hidden');
-            $('#ingred-edit-activate-btn').removeClass('hidden');
-            $('#ingred-edit-deactivate-btn').addClass('hidden');
-        });
-    };
-
-    // Set the source of the rating-star images
-        var starGray = "/static/img/star_gray_100px.png ";
-        var starMagenta = "/static/img/star_magenta_100px.png ";
-
+// ---- Time and Energy ---------------------------------------------
     // Time info popup
-    var timeMouseover = function() {
+    var mouseoverTime = function() {
         $('#time-mouseover-target').on('mouseover', function() {
             $('#time-popup').removeClass('hidden');
             $('#time-editable').addClass('hidden');
@@ -707,13 +629,8 @@
         });
     };
 
-    // Deactivate Time Info Popup during editing
-    var timeMouseoverDeactivate = function() {
-        $('#time-info').on('mouseover', function() {});
-    };
-
     // Energy info popup
-    var energyMouseover = function() {
+    var mouseoverEnergy = function() {
         $('#energy-info').on('mouseover', function() {
             $('#energy-popup').removeClass('hidden');
             $('#energy-editable').addClass('hidden');
@@ -725,6 +642,124 @@
         });
     };
 
+// ---- Ratings -----------------------------------------------------
+    // Set the source of the rating-star images
+        var starGray = "/static/img/star_gray_100px.png ";
+        var starMagenta = "/static/img/star_magenta_100px.png ";
+        var starLightgray = "/static/img/star_lightgray_100px.png ";
+
+    // Update star colors
+    var updateRatingStarColors = function(starType, starNum) {
+        for (i = 1; i <= 5; i++) {
+            if (starNum == -1) {starSource = starLightgray }
+            else if (i <= starNum) { starSource = starMagenta }
+            else { starSource = starGray };
+            $('#star-' + starType + i).attr('src', starSource);
+        };
+    };
+
+    // Display overall rating as colored stars
+    var showRatingCrowd = function() {
+        var ratingTotalFloor = Math.floor($('#rating-total').text());
+        updateRatingStarColors('c-', ratingTotalFloor);
+    };
+
+    // Display user's rating as colored stars; mouseover; remove.
+    var showRatingUser = function() {
+        var ratingSaved = $('#hidden-rating-saved').text();
+        updateRatingStarColors('u-', ratingSaved);
+        showRatingInstructions(ratingSaved);
+
+        // When user mousesover user stars, provisionally update user rating
+        // then, when mouses leaves, return stars to prior state
+        // (But first check if user is logged-in)
+        if(ratingSaved > -1) {
+            $('.star-user').on('mouseover', function() {
+                var starNum = Number(this.id.slice(-1));
+                updateRatingStarColors('u-', starNum);
+            });
+            $('.star-user').on('mouseleave', function() {
+                updateRatingStarColors('u-', ratingSaved);
+            });
+        };
+
+        // Remove user rating when user clicks "remove your rating"
+        $('#rating-remove').on('click', function() {
+            var starNum = 0;
+            ratingPerm(starNum);
+        });
+    };
+
+    // Capture user rating when user clicks on a star
+    var captureRatingUser = function() {
+        $('.star-user').on('click', function() {
+            var starNum = Number(this.id.slice(-1));
+            ratingPerm(starNum);
+        });
+    };
+
+    // Display instructions for user to sign-in or to add or remove rating
+    var showRatingInstructions = function(ratingSaved) {
+        if (ratingSaved == -1) {
+            $('#rating-status').text('Sign-in to rate');
+        } else if (ratingSaved == 0) {
+            $('#rating-status').text('Add your rating');
+        } else {
+            $('#rating-status').text('').append(
+                '<a id="rating-remove">Remove your rating</a>'
+            );
+        };
+    };
+
+    // Show rating distribution information
+    var mouseoverRatingDistribution = function() {
+        $('#key-info-right').on('mouseover', function() {
+            $('#rs-distrib').removeClass('hidden');
+            
+            $('#key-info-right').on('mouseout', function() {
+                $('#rs-distrib').addClass('hidden');
+            });
+        });
+    };
+
+    // When user changes rating, update the rating distrib bars
+    var updateRatingDistribution = function(rsDistribDict) {
+        $('#rs-distrib').text('')
+        for(i=1; i <= 5; i++) {
+            $('#rs-distrib').append(
+                '<div class="rs-bar-holder">' +
+                    '<span class="rs-label">' + i + '</span>' +
+                    '<div class="rs-bar-outline">' +
+                        '<div class="rs-bar"' +
+                             'style="width: ' + rsDistribDict[i]['prcnt'] + '%"' +
+                             '>&nbsp;</div></div>' +
+                    '<span class="rs-percent"' +
+                        '>' + rsDistribDict[i]['prcnt'] + '%</span><br>' +
+                '</div>'
+            );
+        };
+    };
+
+    // Send new user rating to database
+    var ratingPerm = function(starNum) {
+        $('#hidden-rating-saved').text(starNum);
+
+        $.ajax({
+            type: 'GET',
+            url: '/rating_func/' + {{ recipe.pk }},
+            data: { rating_new: starNum },
+            error: function() {},
+            success: function(data) {
+                $('#rating-total').text(data[1]);
+                $('#raters-total').text(data[0]);
+                showRatingUser();
+                showRatingCrowd();
+                updateRatingDistribution(data[2]);
+            }
+        });
+    };
+
+// ---- Servings ----------------------------------------------------
     // Check if a serving number is stored in cookie; update servings 
     var updateServings = function() {
         var servOrig = $('#hidden-servings-orig').text()
@@ -746,18 +781,9 @@
                "role='button'>Change" +
             "</a>"
         );
-        servingsScale(servTemp);
-    };
 
-    // On loading, apply any scaling of the recipe to the ingredient quantities
-    $(function() {
-
-        updateServings();
-        timeMouseover();
-        energyMouseover();
-        activateEditIngredients();
-
-        var numIngreds = $('.quant-qty_common').length
+        // Apply updated scaling to number of ingredients
+        numIngreds = $('.quant-qty_common').length
         for(i = 0; i < numIngreds; i++) {
             qtyComm = Number($('.quant-qty_common')[i].innerText)
             qtyDisplay = qtyComm * servTemp
@@ -781,175 +807,106 @@
             $('.quant-qty_common')[i].innerText = qtyDisplay
         };
 
-        // Rating of Recipes
-        var ratersTotal = $('#raters-total').text();
-        var ratingTotal = $('#rating-total').text();
-        var ratingSaved = $('#hidden-rating-saved').text();
+        servingsScale(servTemp);
+    };
 
-        var starSourceC = [starGray, starGray, starGray, starGray, starGray];
-        var starSourceU = [starGray, starGray, starGray, starGray, starGray];
-
-        for (i = 0; i < Math.floor(ratingTotal); i++) {
-            starSourceC[i] = starMagenta;
-        };
-
-        $('#stars-total').text('').append(
-            "<img class='star-crowd'" +
-                 "id='star-c-1'" +
-                 "src=" + starSourceC[0] + ">" +
-            "<img class='star-crowd'" +
-                 "id='star-c-2'" +
-                 "src=" + starSourceC[1] + ">" +
-            "<img class='star-crowd'" +
-                 "id='star-c-3'" +
-                 "src=" + starSourceC[2] + ">" +
-            "<img class='star-crowd'" +
-                 "id='star-c-4'" +
-                 "src=" + starSourceC[3] + ">" +
-            "<img class='star-crowd'" +
-                 "id='star-c-5'" +
-                 "src=" + starSourceC[4] + ">"
-        );
-
-        for (i = 0; i < ratingSaved; i++) {
-            starSourceU[i] = starMagenta;
-        };
-
-        $('#stars-user').text('').append(
-            "<img class='star-user' id='star-u-1'" +
-                 "src=" + starSourceU[0] + ">" +
-            "<img class='star-user' id='star-u-2'" +
-                 "src=" + starSourceU[1] + ">" +
-            "<img class='star-user' id='star-u-3'" +
-                 "src=" + starSourceU[2] + ">" +
-            "<img class='star-user' id='star-u-4'" +
-                 "src=" + starSourceU[3] + ">" +
-            "<img class='star-user' id='star-u-5'" +
-                 "src=" + starSourceU[4] + ">"
-        );
-        ratingMouseOver(ratingSaved);
-    });
-
-    // Click on item in ingredient list; get ndb_no
-    $('.ingred-list-item').on('click', function() {
-        var itemNdbNo = this.id.split(/[-]/)[1];
-    });
-
-    $('.ingred-list-item').on('mouseover', function() {
-        var itemID = this.id;
-        $('#' + itemID).addClass('ingred-list-highlight');
-
-        var itemNdbNo = itemID.split(/[-]/)[1];
-
-        $('.nutr-cumulative').addClass('hidden')
-        $('.nutr-individ').removeClass('hidden')
-        $('#nutr-table').removeClass('nutr-table-normal')
-        $('#nutr-table').addClass('nutr-table-outline')
-
-        {% autoescape off %}
-        tab_dict = {{ nutr_individ }};
-        {% endautoescape %}
-        
-        $('#nutr-data-energy_tot').text(
-            tab_dict[itemNdbNo].energy_basic.energy_tot
-        );
-        $('#nutr-data-energy_cho').text(
-            tab_dict[itemNdbNo].energy_basic.energy_cho
-        );
-        $('#nutr-data-energy_ptn').text(
-            tab_dict[itemNdbNo].energy_basic.energy_ptn
-        );
-        $('#nutr-data-energy_fat').text(
-            tab_dict[itemNdbNo].energy_basic.energy_fat
-        );
-        $('#nutr-data-mass').text(
-            tab_dict[itemNdbNo].mass
-        );
-        $('#nutr-data-carbs').text(
-            tab_dict[itemNdbNo].nutr_basic_g.carbs
-        );
-        $('#nutr-data-protein').text(
-            tab_dict[itemNdbNo].nutr_basic_g.protein
-        );
-        $('#nutr-data-lipids').text(
-            tab_dict[itemNdbNo].nutr_basic_g.lipids
-        );
-        $('#nutr-data-fiber').text(
-            tab_dict[itemNdbNo].nutr_basic_g.fiber
-        );
-        $('#nutr-data-sugars').text(
-            tab_dict[itemNdbNo].nutr_basic_g.sugars
-        );
-        $('#nutr-data-water').text(
-            tab_dict[itemNdbNo].nutr_basic_g.water
-        );
-        $('#nutr-data-sodium').text(
-            tab_dict[itemNdbNo].nutr_other_mg.sodium
-        );
-    });
-        
-    $('.ingred-list-item').on('mouseout', function() {
-        var itemID = this.id;
-        $('#' + itemID).removeClass('ingred-list-highlight');
-
-        $('.nutr-cumulative').removeClass('hidden')
-        $('.nutr-individ').addClass('hidden')
-        $('#nutr-table').removeClass('nutr-table-outline')
-        $('#nutr-table').addClass('nutr-table-normal')
-
-    });
-
-    // Edit an Attribute in the Name or Header ----------------------
-    $('#recipe-edit-btn').on('click', function() {
-
-        $('.attribute-editable').addClass('hidden');
-        $('.attribute-editing').removeClass('hidden');
-        $('#name-edit-input').focus();
-
-        $('#image-block').addClass('image-edit-format');
-        $('#recipe-stop-edit-btn').removeClass('hidden');
-        $('#recipe-edit-btn').addClass('hidden');
-
-        $('#time_prep-edit-input').on('keyup', function() {
-            timeTotCalc();
+    var servingsScale = function(servTemp) {
+        $('#servings-scale-btn').on('click', function() {
+            $('#servings-display').text('').append(
+                servTemp + " &#8594;" + "&nbsp;&nbsp;" +
+                "<input id='servings-input-box'" +
+                       "type='text'" +
+                       "style='width: 35px;'" +
+                       "value='{{ recipe.servings }}'>" +
+                "</input>"
+            );
+            $('#servings-change').text('').append(
+                "<a id='servings-save-btn'" +
+                   "class='btn btn-primary servings-btn'" +
+                   "role='button'>Save" +
+                "</a>"
+            );
+            $('#servings-input-box').focus();
+            servingsSave();
         });
-        $('#time_cook-edit-input').on('keyup', function() {
-            timeTotCalc();
-        });
+    };
+    
+    // Accept and save servings ...
+    var servingsSave = function() {
+        $('#servings-save-btn').on('click', function() {
+            
+            var servModif = Number($('#servings-input-box').val())
+            Cookies.set("servModifCookie", servModif);
 
-        var timeTotCalc = function() {
-            timePrep = Number($('#time_prep-edit-input').val());
-            timeCook = Number($('#time_cook-edit-input').val());
-            $('#time_tot-edit-calc').text(timePrep + timeCook);
-        };
-
-        $('#time-save-btn').on('click', function() {
-            $('#rating-info').removeClass('hidden');
+            $.ajax({
+                type: 'GET',
+                url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
+                data: { attr: 'servings_scaled',
+                        new_value: servModif,
+                       },
+                error: function() {},
+                success: function() {
+                    location.reload(true);
+                }
+            });
         });
-    });
+    };
+
+// ---- Edit Attributes in the Recipe except ingredients ------------
+    // Enter editing view
+    var enterEditingView = function() {
+        $('#recipe-edit-btn').on('click', function() {
+
+            $('.attribute-editable').addClass('hidden');
+            $('.attribute-editing').removeClass('hidden');
+            $('#name-edit-input').focus();
+
+            $('#image-block').addClass('image-edit-format');
+            $('#recipe-stop-edit-btn').removeClass('hidden');
+            $('#recipe-edit-btn').addClass('hidden');
+
+            $('#time_prep-edit-input').on('keyup', function() {
+                timeTotCalc();
+            });
+            $('#time_cook-edit-input').on('keyup', function() {
+                timeTotCalc();
+            });
+
+            var timeTotCalc = function() {
+                timePrep = Number($('#time_prep-edit-input').val());
+                timeCook = Number($('#time_cook-edit-input').val());
+                $('#time_tot-edit-calc').text(timePrep + timeCook);
+            };
+
+            // Click on the "Save" button for an edited attribute
+            // Get the name of the attribute
+            $('.attr-save-btn').on('click', function() {
+                var attribute = this.id.split(/[-]/)[0];
+
+                if(attribute == "time") {
+                    timeValue(attribute);
+                    $('#rating-info').removeClass('hidden');
+                    $('#energy-editable').removeClass('hidden');
+                    $('#time-editing').addClass('hidden');
+                } else {
+                    attrValue(attribute);
+                };
+            });
+        });
+    };
 
     // Click "Stop Editing" button to restore default views
-    $('#recipe-stop-edit-btn').on('click', function() {
-        $('.attribute-editable').removeClass('hidden');
-        $('.attribute-editing').addClass('hidden');
+    var leaveEditingView = function() {
+        $('#recipe-stop-edit-btn').on('click', function() {
+            $('.attribute-editable').removeClass('hidden');
+            $('.attribute-editing').addClass('hidden');
 
-        $('#image-block').removeClass('image-edit-format');
-        $('#recipe-stop-edit-btn').addClass('hidden');
-        $('#recipe-edit-btn').removeClass('hidden');
-        $('#rating-info').removeClass('hidden');
-    });
-
-    // Click on the "Save" button for an edited attribute
-    // Get the name of the attribute
-    $('.attr-save-btn').on('click', function() {
-        var attribute = this.id.split(/[-]/)[0];
-
-        if(attribute == "time") {
-            timeValue(attribute);
-        } else {
-            attrValue(attribute);
-        };
-    });
+            $('#image-block').removeClass('image-edit-format');
+            $('#recipe-stop-edit-btn').addClass('hidden');
+            $('#recipe-edit-btn').removeClass('hidden');
+            $('#rating-info').removeClass('hidden');
+        });
+    };
 
     // Read edited attribute input values for a given attribute
     var attrValue = function(attribute) {
@@ -966,7 +923,6 @@
         timePrep = Number($('#time_prep-edit-input').val());
         timeCook = Number($('#time_cook-edit-input').val());
         timeTot = timePrep + timeCook;
-        console.log("timeTot: " + timeTot);
 
         attrSave(pAttr, 'time_prep', timePrep);
         attrSave(pAttr, 'time_cook', timeCook);
@@ -987,68 +943,91 @@
             success: function() {
                 $('#' + pAttr + '-editable').removeClass('hidden');
                 $('#' + pAttr + '-editing').addClass('hidden');
-                $('#' + pAttr + '-edit-target').text(newValue|linebreaks);
-            }
-        });
-    };
-
-    // Set up user rating by changing star colors as the mouse touches
-    var ratingMouseOver = function(ratingSaved) {
-        $('.star-user').on('mouseleave', function() {
-            for (i = 1; i <= 5; i++) {
-                if (i <= ratingSaved) {
-                    $('#star-u-' + i).attr('src', starMagenta);
+                if(pAttr == 'directions') {
+                    $('#' + pAttr + '-edit-target').text(newValue|linebreaks);    
                 } else {
-                    $('#star-u-' + i).attr('src', starGray);
+                    $('#' + pAttr + '-edit-target').text(newValue);
                 };
-            };
-        });
-
-        $('.star-user').on('mouseover', function() {
-            var starNum = Number(this.id.slice(-1))
-            // console.log(starNum);
-            ratingTemp(starNum);
-        });
-
-        // Capture actual user rating when user clicks on a star
-        $('.star-user').on('click', function() {
-            var starNum = Number(this.id.slice(-1))
-            console.log(starNum);
-            ratingPerm(starNum);
-        });
-
-        // Remove user rating when user clicks on "remove your rating"
-        $('#rating-remove').on('click', function() {
-            var starNum = 0;
-            console.log(starNum);
-            ratingPerm(starNum);
-        });
-    };
-
-    var ratingTemp = function(starNum) {
-        for (i = 1; i <= 5; i++) {
-            if (i <= starNum) {
-                $('#star-u-' + i).attr('src', starMagenta);
-            } else {
-                $('#star-u-' + i).attr('src', starGray);
-            };
-        };
-    };
-
-    var ratingPerm = function(starNum) {
-
-        $.ajax({
-            type: 'GET',
-            url: '/rating_func/' + {{ recipe.pk }},
-            data: { rating_new: starNum },
-            error: function() {},
-            success: function() {
-                console.log("rating_func success")
-                location.reload(true);
             }
         });
     };
 
+// ---- Mouseover Ingredients to show Individual Nutrients ----------
+    var mouseoverIngredientListDefault = function() {
+        $('.ingred-list-item').on('mouseover', function() {
+            $(this).addClass('ingred-list-highlight');
+
+            var itemID = this.id;
+            var idNums = itemID.replace('ingred-', '');
+            var quantityPK = idNums.split(/[-]/)[0];
+            var itemNdbNo = idNums.split(/[-]/)[1];
+
+            $('.nutr-cumulative').addClass('hidden')
+            $('.nutr-individ').removeClass('hidden')
+            $('#nutr-table').removeClass('nutr-table-normal')
+            $('#nutr-table').addClass('nutr-table-outline')
+            $('#ingred-edit-btn-' + idNums).removeClass('hidden');
+
+            {% autoescape off %}
+            tab_dict = {{ nutr_individ }};
+            {% endautoescape %}
+            
+            $('#nutr-data-energy_tot').text(
+                tab_dict[itemNdbNo].energy_basic.energy_tot
+            );
+            $('#nutr-data-energy_cho').text(
+                tab_dict[itemNdbNo].energy_basic.energy_cho
+            );
+            $('#nutr-data-energy_ptn').text(
+                tab_dict[itemNdbNo].energy_basic.energy_ptn
+            );
+            $('#nutr-data-energy_fat').text(
+                tab_dict[itemNdbNo].energy_basic.energy_fat
+            );
+            $('#nutr-data-mass').text(
+                tab_dict[itemNdbNo].mass
+            );
+            $('#nutr-data-carbs').text(
+                tab_dict[itemNdbNo].nutr_basic_g.carbs
+            );
+            $('#nutr-data-protein').text(
+                tab_dict[itemNdbNo].nutr_basic_g.protein
+            );
+            $('#nutr-data-lipids').text(
+                tab_dict[itemNdbNo].nutr_basic_g.lipids
+            );
+            $('#nutr-data-fiber').text(
+                tab_dict[itemNdbNo].nutr_basic_g.fiber
+            );
+            $('#nutr-data-sugars').text(
+                tab_dict[itemNdbNo].nutr_basic_g.sugars
+            );
+            $('#nutr-data-water').text(
+                tab_dict[itemNdbNo].nutr_basic_g.water
+            );
+            $('#nutr-data-sodium').text(
+                tab_dict[itemNdbNo].nutr_other_mg.sodium
+            );
+        });
+
+        $('.ingred-list-item').on('mouseout', function() {
+            var itemID = this.id;
+            var idNums = itemID.replace('ingred-', '');
+            $('#' + itemID).removeClass('ingred-list-highlight');
+
+            $('.nutr-cumulative').removeClass('hidden')
+            $('.nutr-individ').addClass('hidden')
+            $('#nutr-table').removeClass('nutr-table-outline')
+            $('#nutr-table').addClass('nutr-table-normal')
+            $('#ingred-edit-btn-' + idNums).addClass('hidden');
+        });
+    };
+
+    var mouseoverIngredientListEdit = function() {
+        $('.ingred-list-item').off('mouseover');
+    };
+
+// ---- Add Ingredients ---------------------------------------------
     // Display input box to edit common name of ingredient
     $('#ingred-add-btn').on('click', function() {
         addIngredient();
@@ -1138,7 +1117,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '/json_ingred_nutr/',
+                url: '/get_ingred_nutr_json/',
                 data: {search2: num },
                 error: function() {},
                 success: function(data) {
@@ -1223,47 +1202,135 @@
         });
     };
 
-    var servingsScale = function(servTemp) {
-        $('#servings-scale-btn').on('click', function() {
-            $('#servings-display').text('').append(
-                servTemp + " &#8594;" + "&nbsp;&nbsp;" +
-                "<input id='servings-input-box'" +
-                       "type='text'" +
-                       "style='width: 35px;'" +
-                       "value='{{ recipe.servings }}'>" +
-                "</input>"
-            );
-            $('#servings-change').text('').append(
-                "<a id='servings-save-btn'" +
-                   "class='btn btn-primary servings-btn'" +
-                   "role='button'>Save" +
-                "</a>"
-            );
-            $('#servings-input-box').focus();
-            servingsSave();
+// ---- Edit and Delete Ingredients ---------------------------------
+    // Provide input sites for editing individual ingredients
+    var inputEditIngredients = function(idNums, qty_common, label, name_common) {
+        console.log('inputEditIngredients executed');
+        $('#ingred-edit-append-' + idNums).append(
+            '<input id="quant-qty_common-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="5"' +
+                      'type="text"' +
+                      'value=' + qty_common + '></input>' +
+            '<input id="quant-d-ingred-d-label-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="20"' +
+                      'type="text"' +
+                      'value="' + label + '""></input>' +
+            '<br>' +
+            '<input id="quant-name_common-input"' +
+                      'class="attr-edit-input ingred-input"' +
+                      'maxlength="50"' +
+                      'type="text"' +
+                      'value="' + name_common + '"></input>' +
+            '<a id="ingred-save-btn"' +
+               'class="btn btn-primary ingred-indiv-btn"' +
+               'role="button">Save</a>' +
+            '<a id="ingred-delete-btn-' + idNums + '"' +
+               'class="btn btn-primary ingred-indiv-btn ingred-del-btn"' +
+               'role="button">Delete</a>'
+        );
+    };
+
+    // Edit individual ingredients
+    var activateEditIngredients = function() {
+        $('.ingred-indiv-btn').on('click', function() {
+            var itemID = this.id;
+            var idNums = itemID.replace('ingred-edit-btn-', '');
+            var quantityPK = idNums.split(/[-]/)[0];
+            var itemNdbNo = idNums.split(/[-]/)[1];
+
+            var qty_common = $('#ingred-' + idNums).
+                find(' .quant-qty_common').text();
+            var label = $('#ingred-' + idNums).
+                find(' .quant-d-ingred-d-label').text();
+            var name_common = $('#ingred-' + idNums).
+                find(' .quant-name_common').text();
+
+            $('#ingred-' + idNums).addClass('ingred-indiv-edit');
+            $('#ingred-cancel-btn-' + idNums).removeClass('hidden');
+            $('#ingred-edit-btn-' + idNums).addClass('hidden');
+            mouseoverIngredientListEdit();
+            inputEditIngredients(idNums, qty_common, label, name_common);
+
+            $('#ingred-cancel-btn-' + idNums).on('click', function() {
+                $('#ingred-' + idNums).removeClass('ingred-indiv-edit');
+                $('#ingred-cancel-btn-' + idNums).addClass('hidden');
+                $('#ingred-edit-append-' + idNums).text('');
+                mouseoverIngredientListDefault();
+            });
+
+            preDeleteIndividualIngredients(idNums, quantityPK, itemNdbNo, name_common);
         });
     };
-    
-    // Accept and save servings ...
-    var servingsSave = function() {
-        $('#servings-save-btn').on('click', function() {
-            
-            var servModif = Number($('#servings-input-box').val())
-            Cookies.set("servModifCookie", servModif);
 
-            $.ajax({
-                type: 'GET',
-                url: '/recipe_attr_edit_func/' + {{ recipe.pk }},
-                data: { attr: 'servings_scaled',
-                        new_value: servModif,
-                       },
-                error: function() {},
-                success: function() {
-                    location.reload(true);
-                }
+    // Confirmation before deleting individual ingredient
+    var preDeleteIndividualIngredients = function(idNums, quantityPK, qty_common, label, name_common) {
+        $('#ingred-delete-btn-' + idNums).on('click', function() {
+            $('#ingred-cancel-btn-' + idNums).addClass('hidden');
+            $('#ingred-edit-append-' + idNums).text('').append(
+                'Are you sure you want to delete ' +
+                name_common +
+                '? ' +
+                '<a id="ingred-del-conf-btn-' + idNums + '"' +
+                   'class="btn btn-primary ingred-indiv-btn"' +
+                   'role="button">Delete</a>' +
+                '<a id="ingred-del-cancel-btn-' + idNums + '"' +
+                   'class="btn btn-primary ingred-indiv-btn"' +
+                   'role="button">Cancel</a>'
+            );
+
+            $('#ingred-del-conf-btn-' + idNums).on('click', function() {
+                deleteIndividualIngredients(quantityPK, idNums);
+            });
+
+            $('#ingred-del-cancel-btn-' + idNums).on('click', function() {
+                console.log('ingred-del-cancel-btn clicked');
+                $('#ingred-cancel-btn-' + idNums).removeClass('hidden');
+                $('#ingred-edit-append-' + idNums).text('');
+                inputEditIngredients(idNums, qty_common, label, name_common);
             });
         });
     };
+
+    // Delete Individual Ingredients
+    var deleteIndividualIngredients = function(quantityPK, idNums) {
+        $.ajax({
+            type: 'GET',
+            url: '/del_quantity/',
+            data: { quantity_pk: quantityPK },
+            error: function() {},
+            success: function() {
+                $('#ingred-' + idNums).text('')
+                $('#ingred-' + idNums).removeClass('ingred-indiv-edit');
+                mouseoverIngredientListDefault();
+            }
+        });
+    };
+
+// ---- On Document Load... -----------------------------------------
+    $(function() {
+
+        // Servings
+        // On loading, apply any scaling of the recipe to the ingredient quantities
+        updateServings();
+
+        // Ratings
+        showRatingCrowd();
+        showRatingUser();
+        captureRatingUser();
+
+        // Popups / Mouseovers
+        mouseoverTime();
+        mouseoverEnergy();
+        mouseoverRatingDistribution();
+        mouseoverIngredientListDefault();
+
+        // Editing
+        enterEditingView();
+        leaveEditingView();
+        activateEditIngredients();
+    });
 
 </script>
 

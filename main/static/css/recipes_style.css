@@ -177,6 +177,50 @@
         padding-right: 0px;
     }
 
+    #key-info-right-margin {
+        /*background-color: Pink;*/
+    }
+
+    #rs-distrib {
+        width: 180px;
+        padding: 15px;
+        background-color: White;
+        z-index: 10;
+    }
+
+    .rs-bar-holder {
+        font-size: 11px;
+        position: relative;
+    }
+
+    .rs-label {
+        float: left;
+        display: inline-block;
+        width: 7px;
+    }
+
+    .rs-bar-outline {
+        float: left;
+        width: 60px;
+        border: 1px solid DarkGray;
+        line-height: .7;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        margin-right: 7px;
+        margin-left: 5px;
+    }
+
+    .rs-bar {
+        display: inline-block;
+        background-color: LightSteelBlue;
+        line-height: .7;
+    }
+
+    .rs-percent {
+        float: left;
+        display: inline-block;
+    }
+
 /* ---- Ingredient and Nutrition Info ---------------------------- */
     #ingred-and-nutr-block {
         border-bottom: 3px solid LightSlateGray;
@@ -194,7 +238,7 @@
     }*/
 
     .ingred-list-highlight {
-        background-color: SkyBlue;
+        background-color: LightSlateGray;
     }
 
     #servings-label {
@@ -248,6 +292,11 @@
         line-height: 1;
     }
 
+    .ingred-indiv-edit {
+        background-color: Pink;
+        border: 3px solid Red;
+    }
+
     #quant-qty_common-input {
         width: 40px;
         margin-left: 0px;
@@ -296,7 +345,7 @@
     }
 
     .nutr-table-outline {
-        border: 3px solid SkyBlue;
+        border: 3px solid LightSlateGray;
     }
 
     .nutr-label {

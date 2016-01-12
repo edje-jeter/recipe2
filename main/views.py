@@ -213,7 +213,7 @@ def get_ingred_ndb_json(request):
     return JsonResponse(object_list, safe=False)
 
 
-def JsonIngredNutr(request):
+def get_ingred_nutr_json(request):
     ndb_no = request.GET.get('search2', '')
 
     nutr_list = NDBQuery(ndb_no)
@@ -400,16 +400,19 @@ def scale_basic_nutr(nutr_basic_g, nutr_other_mg, energy_basic, servings, nutr_i
 
 # ---- Get Rating and Rating Stats ----------------------------------
 def get_ratings(active, request, pk, recipe):
+    print "get_ratings executed"
+    print "active: %s" % active
     if active:
         h_temp = "_".join([str(pk), str(request.user.username)])
         rating, created = Rating.objects.get_or_create(recipe=recipe,
                                                        handle=h_temp)
         if created:
-            return HttpResponseRedirect('/rating_stats_func/%s' % pk)
-        rating_v = rating
+            rating_stats_func(request, pk)
+        rating_v = rating.rating
     else:
         rating_v = -1
 
+    print "rating_v: %s" % rating_v
     return rating_v
 
 
@@ -417,7 +420,89 @@ def get_ratings(active, request, pk, recipe):
 def get_rating_stats(recipe):
     rating_stat, created = RatingStat.objects.get_or_create(recipe=recipe)
 
-    return rating_stat
+    rating_count = rating_stat.count
+    rating_avg = rating_stat.avg
+
+    rating_distrib = {}
+    for i in range(1, 6):
+        rating_distrib[i] = {'ct': int(getattr(rating_stat, 'r%s_d' % i)),
+                             'prcnt': int(getattr(rating_stat, 'r%s_p' % i))
+                             }
+
+    return [rating_count, rating_avg, rating_distrib]
+
+
+# ---- Rating Recipes -----------------------------------------------
+def rating_func(request, pk):
+
+    rating_new = request.GET.get('rating_new', '')
+
+    h_temp = "_".join([str(pk), str(request.user)])
+    rating_cur = Rating.objects.get(handle=h_temp)
+
+    rating_cur.rating = rating_new
+
+    rating_cur.save()
+
+    rating_stats_func(request, pk)
+    rating_stats_list = get_rating_stats(Recipe.objects.get(pk=pk))
+
+    return JsonResponse(rating_stats_list, safe=False)
+
+
+def rating_stats_func(request, pk):
+
+    # Count (zero and non-zero) ratings for the given Recipe --------
+    r0_obj = Rating.objects.filter(recipe=pk)
+    r0_len = len(r0_obj)
+
+    r_obj = r0_obj.exclude(rating=0)
+    r_count = len(r_obj)
+    r0_count = r0_len - r_count
+
+    # Sum ratings and collect data for distribution / histogram -----
+    r_sum = 0
+    r_distrib = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    for r in r_obj:
+        r_sum += r.rating
+        r_distrib[int(r.rating)] += 1
+
+    # Find the average rating for the given Recipe ------------------
+    if r_count == 0:
+        r_avg = 0
+    else:
+        r_avg = float(r_sum) / float(r_count)
+
+    # Calculate histogram % for each star-rating --------------------
+    r_percent = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    if r_count > 0:
+        for r in r_percent:
+            r_percent[r] = r_distrib[r] * 100 / r_count
+    else:
+        pass
+
+    # Save stats to RatingStat model --------------------------------
+    rating_stat, created = RatingStat.objects.get_or_create(recipe_id=pk)
+
+    rating_stat.count = r_count
+    rating_stat.avg = r_avg
+
+    # Populate distrib and % fields: (r0_d; r1_d, r2_d, ...; r1_p, r2_p, ...)
+    rating_stat.r0_d = r0_count
+
+    for r in r_distrib:
+        attr_distrib = "r%s_d" % r
+        val_distrib = r_distrib[r]
+        setattr(rating_stat, attr_distrib, val_distrib)
+
+        attr_percent = "r%s_p" % r
+        val_percent = r_percent[r]
+        setattr(rating_stat, attr_percent, val_percent)
+
+    rating_stat.save()
+
+    # return HttpResponseRedirect('/recipe_detail/%s' % pk)
+    return HttpResponse(status=200)
 
 
 # ---- Get Old Comments ---------------------------------------------
@@ -470,8 +555,12 @@ def recipe_detail(request, pk):
     # Authenticate the user
     active = request.user.is_authenticated()
 
-    # # Handle Comments
+    # Display others' ratings
+    rs = get_rating_stats(recipe)
+
+    # Handle Comments
     old_comments = get_old_comments(recipe)
+    cntxt_comments_v = ""
     if active:
         cntxt_comments_v = CommentForm(initial={'recipe': pk})
         if request.method == 'POST':
@@ -495,7 +584,9 @@ def recipe_detail(request, pk):
     context['active'] = active
 
     context['rating_v'] = get_ratings(active, request, pk, recipe)
-    context['rating_stat_v'] = get_rating_stats(recipe)
+    context['rs_count'] = rs[0]
+    context['rs_avg'] = rs[1]
+    context['rs_distrib'] = rs[2]
 
     context['old_comments_v'] = old_comments
     context['comments_v'] = cntxt_comments_v
@@ -576,18 +667,6 @@ def recipe_delete_page(request, pk):
 
     return render_to_response('recipe_delete_page.html', context,
                               context_instance=RequestContext(request))
-
-
-# def upload_image(request, pk):
-#     if request.method == 'POST':
-#         form = UploadImageForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponse(status=200)
-#     else:
-#         form = UploadImageForm()
-
-#     return render(request, 'upload.html', {'form': form})
 
 
 # ---- Add and Delete Ingredients (models.py Ingredient) ------------
@@ -747,71 +826,3 @@ def user_del_page(request):
 
     return render_to_response('user_del_page.html', context,
                               context_instance=RequestContext(request))
-
-
-# ---- Rating Recipes -----------------------------------------------
-def rating_func(request, pk):
-
-    rating_new = request.GET.get('rating_new', '')
-
-    h_temp = "_".join([str(pk), str(request.user)])
-    rating_cur = Rating.objects.get(handle=h_temp)
-
-    rating_cur.rating = rating_new
-
-    rating_cur.save()
-
-    return HttpResponseRedirect('/rating_stats_func/%s' % pk)
-
-
-def rating_stats_func(request, pk):
-
-    # Count (zero and non-zero) ratings for the given Recipe --------
-    r0_obj = Rating.objects.filter(recipe=pk)
-    r0_len = len(r0_obj)
-
-    r_obj = r0_obj.exclude(rating=0)
-    r_count = len(r_obj)
-    r0_count = r0_len - r_count
-
-    # Sum ratings and collect data for distribution / histogram -----
-    r_sum = 0
-    r_distrib = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-    for r in r_obj:
-        r_sum += r.rating
-        r_distrib[int(r.rating)] += 1
-
-    # Find the average rating for the given Recipe ------------------
-    if r_count == 0:
-        r_avg = 0
-    else:
-        r_avg = float(r_sum) / float(r_count)
-
-    # Calculate histogram % for each star-rating --------------------
-    r_percent = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-    if r_count > 0:
-        for r in r_percent:
-            r_percent[r] = r_distrib[r] * 100 / r_count
-    else:
-        pass
-
-    # Save stats to RatingStat model --------------------------------
-    rating_stat, created = RatingStat.objects.get_or_create(recipe_id=pk)
-
-    rating_stat.count = r_count
-    rating_stat.avg = r_avg
-
-    # Populate distrib and % fields: (r0_d; r1_d, r2_d, ...; r1_p, r2_p, ...)
-    rating_stat.r0_d = r0_count
-    for r in r_distrib:
-        attr_distrib = "r%s_d" % r
-        val_distrib = r_distrib[r]
-        setattr(rating_stat, attr_distrib, val_distrib)
-
-        attr_percent = "r%s_p" % r
-        val_percent = r_percent[r]
-        setattr(rating_stat, attr_percent, val_percent)
-
-    rating_stat.save()
-
-    return HttpResponseRedirect('/recipe_detail/%s' % pk)
